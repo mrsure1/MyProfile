@@ -1,0 +1,61 @@
+{
+  "nav_about": "소개",
+  "nav_experience": "경력",
+  "nav_skills": "역량",
+  "nav_contact": "문의",
+
+  "hero_kicker": "AI 융합 교육 및 글로벌 비즈니스 전략가",
+  "hero_h1": "AI·로보틱스·교육·글로벌 비즈니스를 연결합니다.",
+  "hero_sub": "융합 기술 교육과 글로벌 사업 전략으로 실행 가능한 혁신을 만듭니다.",
+  "cta_experience": "경력 보기",
+  "cta_contact": "이메일 문의",
+
+  "profile_title": "AI 융합 교육 · 글로벌 비즈니스 전략",
+  "profile_meta": "로보틱스/AI 상용화 · 데이터 기반 디지털 마케팅 · 글로벌 오퍼레이션\nIT/AI 교육 콘텐츠 설계 및 전문 강연",
+
+  "about_h2": "핵심 프로필",
+  "about_lead": "기술 전문성과 글로벌 커뮤니케이션 역량을 갖춘 AI 융합 교육 및 글로벌 비즈니스 전략가. 미국에 10년 거주, 싱가포르 1DERFOOD, 소셜미디어 전략연구소 등에서 주요 관리직 역임; 두산/레인보우로보틱스 제휴 주방 로봇 개발 및 AI 응용 솔루션 기반 비즈니스 혁신 주도.",
+
+  "about_edu_h3": "학력",
+  "about_edu_p": "전자계산학과 학사 · 영어영문학 학사",
+
+  "about_teach_h3": "IT/AI 교육",
+  "about_teach_p": "IT 활용 및 디지털 리터러시 교육 기획/운영; 문화센터에서 IT/AI 교육 콘텐츠 설계 및 전문 강연",
+
+  "exp_h2": "주요 경력",
+  "exp_lead": "디지털 마케팅 리더십부터 IT 교육, AI 응용까지 목표에 맞는 실행을 설계하고 결과를 만듭니다.",
+
+  "exp1_t": "소셜미디어 전략연구소 실장 (General Manager)",
+  "exp1_d": "기업/브랜드 맞춤형 소셜미디어 채널 구축 및 통합 마케팅(IMC) 전략 수립; 빅데이터 기반 소셜 트렌드 분석 및 뉴미디어 콘텐츠 전략 총괄",
+  "exp2_t": "Business Manager — 1DERFOOD (Singapore)",
+  "exp2_d": "푸드테크 프로젝트: 두산로보틱스·레인보우로보틱스 제휴 주방 로봇 개발 및 싱가포르 현지 적용",
+  "exp3_t": "중소기업 총괄이사 (Executive Director)",
+  "exp3_d": "해외 영업, 구매, 생산 관리 총괄 및 밸류체인 최적화",
+  "exp4_t": "리무진 웨딩카 법인 대표 · 글로벌 성우 에이전시 운영",
+  "exp4_d": "법인 운영 및 대외 협업",
+  "exp5_t": "IT 교육 전문 강사",
+  "exp5_d": "미국 10년 거주 중 현지 대상 IT 활용 및 디지털 리터러시 교육 기획/운영",
+  "exp6_t": "AI 및 디지털 콘텐츠 전문가",
+  "exp6_d": "AI 응용 앱 개발, 업무 자동화 시스템 구축, 영상 편집(Premiere), 디자인(Photoshop), WordPress 웹 구축",
+  "exp7_t": "VAN사 전산실 시스템 운영",
+  "exp7_d": "금융 인프라 데이터 처리 및 보안 시스템 운영",
+  "exp8_t": "글로벌 비즈니스·교육·기술 융합 프로젝트 수행",
+  "exp8_d": "로보틱스/AI 상용화, 전략 마케팅, 글로벌 오퍼레이션, 융합 기술 교육 리딩",
+
+  "skills_h2": "핵심 역량",
+  "skills_lead": "현장 적용 가능한 로보틱스/AI 기획부터 글로벌 오퍼레이션, 교육 콘텐츠까지 End-to-End로 설계",
+
+  "tag1": "Robotics & AI: 협동 로봇 솔루션 · 주방 자동화 기획",
+  "tag2": "Digital Marketing: 소셜미디어 전략 · 브랜드 빌딩 · 퍼포먼스 분석",
+  "tag3": "Global & Lang: 영어영문학 · 미국 10년 · 비즈니스 영어",
+  "tag4": "IT & Dev: 전자계산학 · AI 솔루션 · 시스템 인프라 이해",
+  "tag5": "AI & 콘텐츠: 업무 자동화 · AI 앱 · 디지털 콘텐츠 제작",
+  "tag6": "WordPress/Design: 웹 구축 · 운영 · 디자인/영상 편집",
+
+  "contact_h2": "문의",
+  "contact_lead": "프로젝트 협업 및 강연/교육 문의는 이메일로 연락 주세요.",
+  "contact_email_label": "Email",
+  "contact_btn": "메일 보내기",
+
+  "footer_note": "© AI Application Creator · mrsure.kr/ai"
+}

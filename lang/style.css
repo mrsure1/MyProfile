@@ -1,0 +1,869 @@
+/* ===========================
+   AI Landing Page Styles v2
+   =========================== */
+
+:root{
+  --bg:#0b1220;
+  --bg2:#0e1a30;
+  --card:rgba(255,255,255,.06);
+  --card2:rgba(255,255,255,.085);
+  --border:rgba(255,255,255,.12);
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.72);
+  --muted2:rgba(255,255,255,.58);
+  --accent:#4fd1ff;
+  --accent2:#7cf3d0;
+  --neon-orange: #ff7a18;
+  --neon-orange2: #ffb35c;
+  --neon-shadow: 0 0 12px rgba(255,122,24,.35), 0 0 28px rgba(255,122,24,.22);
+  --shadow: 0 20px 60px rgba(0,0,0,.35);
+  --radius:16px;
+  --max:1120px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+  color:var(--text);
+  background: 
+    radial-gradient(1200px 800px at 20% 0%, rgba(79,209,255,.18), transparent 60%),
+    radial-gradient(900px 700px at 80% 20%, rgba(124,243,208,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  min-height: 100vh;
+}
+
+a{color:inherit; text-decoration:none}
+a:hover{color:var(--accent)}
+img{max-width:100%; display:block}
+
+.ai-wrap{
+  width:100%;
+  position:relative;
+  overflow:hidden;
+}
+
+/* ===========================
+   Floating Language Toggle
+   =========================== */
+
+.ai-lang-float{
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center;
+  pointer-events: auto !important;
+  opacity: 0.4;
+  transition: opacity .3s ease;
+}
+
+.ai-lang-float:hover{
+  opacity: 1;
+}
+
+.ai-lang-float button{
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 21px !important;
+  width: 21px !important;
+  height: 16px !important;
+  padding: 0 5px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(79,209,255,.5) !important;
+  background: rgba(11,18,32,.3) !important;
+  color: rgba(255,255,255,.7) !important;
+  font-weight: 600 !important;
+  font-size: 6px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  transition: all .2s ease !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2) !important;
+  pointer-events: auto !important;
+}
+
+.ai-lang-float button:hover{
+  background: rgba(11,18,32,.5) !important;
+  border-color: rgba(79,209,255,.8) !important;
+  color: rgba(255,255,255,.9) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3) !important;
+}
+
+.ai-lang-float button[aria-pressed="true"]{
+  border-color: rgba(255,122,24,.8) !important;
+  background: rgba(11,18,32,.4) !important;
+  color: rgba(255,255,255,.95) !important;
+  box-shadow: 0 0 4px rgba(255,122,24,.3), 0 1px 4px rgba(0,0,0,.25) !important;
+}
+
+/* ===========================
+   Hero Section
+   =========================== */
+
+.ai-section{
+  position:relative;
+  padding:76px 0;
+}
+
+.ai-container{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:0 18px;
+}
+
+.ai-hero{
+  padding:0;
+}
+
+.ai-hero-bg{
+  position:relative;
+  min-height:560px;
+  display:flex;
+  align-items:stretch;
+  background:
+    linear-gradient(90deg, rgba(11,18,32,.95), rgba(11,18,32,.85) 60%, rgba(11,18,32,.65)),
+    radial-gradient(800px 600px at 30% 40%, rgba(79,209,255,.15), transparent 70%),
+    radial-gradient(600px 400px at 70% 60%, rgba(124,243,208,.12), transparent 65%),
+    linear-gradient(135deg, #0e1a30, #0b1220);
+  background-size: cover;
+  background-position: center;
+  background-attachment: scroll;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.ai-hero-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.01) 2px, rgba(255,255,255,.01) 4px),
+    repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(255,255,255,.008) 2px, rgba(255,255,255,.008) 4px);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.ai-hero-inner{
+  width:100%;
+  display:grid;
+  grid-template-columns: .75fr 1.25fr;
+  gap:28px;
+  align-items:center;
+  padding:74px 18px;
+  max-width:var(--max);
+  margin:0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color:var(--muted);
+  width:fit-content;
+}
+
+.ai-kicker span{
+  display:inline-block;
+  width:7px; 
+  height:7px; 
+  border-radius:50%;
+  background: var(--accent);
+  box-shadow:0 0 16px rgba(79,209,255,.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%, 100%{ opacity: 1; transform: scale(1); }
+  50%{ opacity: .7; transform: scale(0.9); }
+}
+
+/* 한국어 텍스트 줄바꿈 최적화 */
+.ai-h1 {
+  font-size: clamp(28px, 3.5vw, 48px) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.6px !important;
+  word-break: keep-all !important;  /* 한국어 단어 단위로 줄바꿈 */
+  overflow-wrap: break-word !important;
+  hyphens: none !important;
+  max-width: 100% !important;
+  margin: 16px 0 14px !important;
+}
+
+/* 제목이 너무 길 경우를 대비한 조정 */
+.ai-h1 br {
+  display: none !important;  /* 강제 줄바꿈 제거 */
+}
+
+/* 서브 텍스트도 자연스럽게 */
+.ai-sub {
+  font-size: clamp(14px, 1.3vw, 17px) !important;
+  line-height: 1.65 !important;
+  word-break: keep-all !important;
+  max-width: 600px !important;
+  margin: 0 0 22px !important;
+  color: var(--muted);
+}
+
+.ai-cta{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.ai-btn{
+  position: relative;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  transition: all .2s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.ai-btn:hover{
+  transform: translateY(-2px);
+  border-color: rgba(79,209,255,.45);
+  background: rgba(79,209,255,.12);
+  box-shadow: 0 12px 35px rgba(0,0,0,.25);
+}
+
+.ai-btn.primary{
+  border-color: rgba(79,209,255,.55);
+  background: linear-gradient(135deg, rgba(79,209,255,.18), rgba(124,243,208,.10));
+}
+
+.ai-btn::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255,122,24,.18), rgba(79,209,255,.10), transparent 55%);
+  opacity:0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+
+.ai-btn:hover::after{ 
+  opacity:1; 
+}
+
+/* 3D Hero Element - 명확하게 표시 */
+.ai-hero-3d{
+  margin-top: 24px;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.ai-3d-wrap{
+  width: min(360px, 92vw);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(10,16,30,.18);
+  border: 1px solid rgba(120,160,255,.18);
+  box-shadow: 0 18px 45px rgba(0,0,0,.45);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  display: block !important;
+}
+
+.ai-3d-wrap:hover{
+  transform: translateY(-4px);
+  border-color: rgba(255,120,0,.85);
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.55),
+    0 0 18px rgba(255,120,0,.35),
+    0 0 42px rgba(255,120,0,.18);
+}
+
+.ai-3d-img{
+  width: 100%;
+  display: block !important;
+  height: auto;
+}
+
+@keyframes slowSpin{
+  0%{ transform: rotate(0deg); }
+  100%{ transform: rotate(360deg); }
+}
+
+/* ===========================
+   히어로 섹션 - 배경은 Full Width, 컨텐츠는 적절한 폭 유지
+   =========================== */
+
+/* 히어로 섹션 - 배경 이미지 사이즈 기반 조정 */
+.ai-hero {
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+}
+
+.ai-hero-bg {
+  width: 100% !important;
+  max-width: 100% !important;
+  /* 배경 이미지가 잘리지 않도록 */
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* 컨텐츠 영역 - 화면 크기에 따라 동적 조정 */
+.ai-hero-inner {
+  max-width: min(1600px, 90vw) !important;  /* 화면의 90% 또는 최대 1600px */
+  width: 100% !important;
+  padding: 74px 60px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+/* 그리드 레이아웃이 깨지지 않도록 */
+.ai-hero-inner {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: 28px;
+  align-items: center;
+}
+
+/* 초대형 화면 */
+@media (min-width: 1920px) {
+  .ai-hero-inner {
+    max-width: 1800px !important;
+    padding-left: 80px !important;
+    padding-right: 80px !important;
+  }
+}
+
+/* 대형 화면 */
+@media (min-width: 1400px) and (max-width: 1919px) {
+  .ai-hero-inner {
+    max-width: 1400px !important;
+    padding-left: 60px !important;
+    padding-right: 60px !important;
+  }
+}
+
+/* 중형 화면 */
+@media (min-width: 980px) and (max-width: 1399px) {
+  .ai-hero-inner {
+    max-width: 1200px !important;
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+  }
+}
+
+/* 태블릿 */
+@media (max-width: 979px) {
+  .ai-hero-inner {
+    max-width: 100% !important;
+    grid-template-columns: 1fr;
+    padding: 58px 40px !important;
+  }
+}
+
+/* 모바일 */
+@media (max-width: 520px) {
+  .ai-hero-inner {
+    padding: 40px 18px !important;
+  }
+}
+
+/* Profile Card */
+.ai-profile-card{
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  transition: transform .22s ease,
+              border-color .22s ease,
+              box-shadow .22s ease,
+              background .22s ease;
+}
+
+.ai-profile-card:hover{
+  transform: translateY(-8px);
+  border-color: rgba(255,122,24,.75);
+  box-shadow: var(--neon-shadow), 0 18px 55px rgba(0,0,0,.35);
+  background: rgba(255,255,255,.075);
+}
+
+.ai-profile-top{
+  padding:16px 16px 0;
+}
+
+.ai-avatar{
+  border-radius: 14px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+}
+
+.ai-avatar img{
+  width:100%;
+  height:auto;
+}
+
+.ai-profile-body{
+  padding:14px 16px 16px;
+}
+
+.ai-title{
+  font-weight:700;
+  margin:0 0 6px;
+}
+
+.ai-meta{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.45;
+  margin:0;
+  white-space: pre-line;
+}
+
+/* ===========================
+   Section Styles
+   =========================== */
+
+.ai-divider-bg{
+  position: relative;
+  overflow:hidden;
+  background:
+    radial-gradient(800px 500px at 20% 20%, rgba(79,209,255,.10), transparent 60%),
+    radial-gradient(600px 400px at 80% 80%, rgba(124,243,208,.08), transparent 55%),
+    linear-gradient(180deg, rgba(11,18,32,.0), rgba(11,18,32,.65));
+}
+
+.ai-divider-bg::before{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  background: radial-gradient(circle at var(--mx, 40%) var(--my, 35%),
+    rgba(255,122,24,.12), rgba(79,209,255,.10), transparent 60%);
+  opacity:.65;
+  pointer-events:none;
+  transition: opacity .3s ease;
+  z-index:0;
+}
+
+.ai-divider-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,.015) 3px, rgba(255,255,255,.015) 6px);
+  opacity: 0.3;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.ai-divider-bg .ai-container{ 
+  position:relative; 
+  z-index:1; 
+}
+
+.ai-h2{
+  font-size: 26px;
+  margin:0 0 14px;
+  letter-spacing:-.2px;
+}
+
+.ai-lead{
+  color:var(--muted);
+  margin:0 0 22px;
+  line-height:1.7;
+  max-width: 78ch;
+}
+
+/* ===========================
+   Grid & Cards
+   =========================== */
+
+.ai-grid{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap:14px;
+  perspective: 900px;
+}
+
+.ai-card{
+  grid-column: span 6;
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  padding:18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  position: relative;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform .22s ease,
+              border-color .22s ease,
+              box-shadow .22s ease,
+              background .22s ease,
+              opacity .22s ease,
+              filter .22s ease;
+}
+
+.ai-card h3{
+  margin:0 0 8px;
+  font-size:16px;
+  transition: font-size .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-card p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:14.5px;
+  transition: color .22s ease,
+              font-size .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (hover: hover) and (pointer: fine){
+  .ai-card:hover{
+    transform: translateY(-12px) translateZ(48px) scale(1.05);
+    z-index: 6;
+    border-color: rgba(255,122,24,.75) !important;
+    box-shadow: var(--neon-shadow), 0 18px 55px rgba(0,0,0,.35);
+    background: rgba(255,255,255,.075);
+  }
+
+  .ai-card:hover h3{
+    font-size: 18px;
+  }
+
+  .ai-card:hover p{
+    color: rgba(255,255,255,.86);
+    font-size: 16.5px;
+  }
+
+  .ai-grid:hover .ai-card{
+    opacity: .5;
+    filter: brightness(.85) saturate(.85);
+  }
+
+  .ai-grid:hover .ai-card:hover{
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* ===========================
+   Tags
+   =========================== */
+
+.ai-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:10px;
+}
+
+.ai-tag{
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  color:var(--muted);
+  font-size:13px;
+  transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-tag:hover{
+  border-color: rgba(79,209,255,.45);
+  background: rgba(79,209,255,.12);
+  color: var(--text);
+  transform: translateY(-4px) scale(1.05);
+  font-size: 15px;
+  box-shadow: 0 6px 20px rgba(79,209,255,.25);
+}
+
+/* Timeline */
+.ai-timeline{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  perspective: 1200px;
+  perspective-origin: center;
+}
+
+.ai-item{
+  display:flex !important;
+  gap:12px;
+  align-items:flex-start;
+  padding:14px 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  position: relative;
+  transform: translateZ(0);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: 
+    transform .22s ease,
+    border-color .22s ease,
+    box-shadow .22s ease,
+    background .22s ease,
+    opacity .22s ease,
+    filter .22s ease;
+  cursor: pointer;
+}
+
+.ai-bullet{
+  width:10px !important; 
+  height:10px !important; 
+  border-radius:50%;
+  margin-top:6px;
+  background: rgba(79,209,255,.9);
+  box-shadow: 0 0 18px rgba(79,209,255,.35);
+  flex-shrink: 0;
+  transition: 
+    transform .22s ease,
+    box-shadow .22s ease,
+    background .22s ease;
+}
+
+.ai-item strong{
+  display:block !important;
+  font-size:14.5px;
+  margin-bottom:4px;
+  transition: font-size .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ai-item span{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+  display: block;
+  transition: 
+    color .22s ease,
+    font-size .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 호버 효과 - 폰트 크기 대폭 확대 */
+@media (hover: hover) and (pointer: fine){
+  .ai-item:hover{
+    transform: translateY(-12px) translateZ(48px) scale(1.05);
+    z-index: 6;
+    border-color: rgba(255,122,24,.75) !important;
+    box-shadow: 
+      0 0 12px rgba(255,122,24,.35), 
+      0 0 28px rgba(255,122,24,.22),
+      0 18px 55px rgba(0,0,0,.35);
+    background: rgba(255,255,255,.075);
+  }
+
+  .ai-item:hover .ai-bullet{
+    transform: scale(1.6);
+    box-shadow: 0 0 35px rgba(79,209,255,1);
+    background: rgba(79,209,255,1);
+  }
+
+  /* 제목(strong) 폰트 크기 20px 이상으로 확대 */
+  .ai-item:hover strong{
+    font-size: 22px !important;  /* 14.5px → 22px */
+    color: rgba(255,255,255,1) !important;
+    font-weight: 700 !important;
+  }
+
+  /* 설명(span) 폰트 크기 20px 이상으로 확대 */
+  .ai-item:hover span{
+    color: rgba(255,255,255,.95) !important;
+    font-size: 20px !important;  /* 14px → 20px */
+    line-height: 1.7 !important;
+  }
+
+  .ai-timeline:hover .ai-item{
+    opacity: .5;
+    filter: brightness(.85) saturate(.85);
+  }
+
+  .ai-timeline:hover .ai-item:hover{
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* Cascade Animation */
+@keyframes cascadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateX(-30px) translateY(20px) rotateY(-15deg); 
+    filter: blur(3px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0) translateY(0) rotateY(0); 
+    filter: blur(0); 
+  }
+}
+
+.js .ai-item{
+  opacity: 0;
+}
+
+.ai-item.cascade-show{
+  animation: cascadeIn .8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+/* 모바일에서는 호버 효과 제거 */
+@media (hover: none){
+  .ai-item:hover{
+    transform: none;
+  }
+}
+
+/* ===========================
+   Contact Section
+   =========================== */
+
+.ai-contact{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+  padding:18px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(79,209,255,.12), rgba(255,255,255,.04));
+  border:1px solid rgba(79,209,255,.22);
+}
+
+.ai-contact a{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(11,18,32,.35);
+  transition: all .2s ease;
+}
+
+.ai-contact a:hover{
+  border-color: rgba(79,209,255,.45);
+  background: rgba(79,209,255,.12);
+  transform: translateY(-2px);
+}
+
+.ai-footer-note{
+  color:var(--muted2);
+  font-size:13px;
+  margin-top:14px;
+}
+
+/* ===========================
+   Animations
+   =========================== */
+
+.ai-fade{
+  opacity:0;
+  transform: translateY(10px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+
+.ai-fade.show{
+  opacity:1;
+  transform: translateY(0);
+}
+
+@keyframes softUp {
+  from { 
+    opacity:0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity:1; 
+    transform: translateY(0); 
+  }
+}
+
+.js .ai-h2, 
+.js .ai-lead{
+  opacity:0;
+}
+
+.ai-fade.show .ai-h2,
+.ai-fade.show .ai-lead{
+  animation: softUp .55s ease forwards;
+}
+
+.ai-fade.show .ai-lead{
+  animation-delay: 120ms;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+
+@media (max-width: 980px){
+  .ai-hero-inner{
+    grid-template-columns: 1fr;
+    padding:58px 18px;
+  }
+  
+  .ai-profile-card{
+    max-width: 420px;
+  }
+  
+  .ai-card{ 
+    grid-column: span 12; 
+  }
+}
+
+@media (max-width: 520px){
+  .ai-lang-float{
+    top: 12px !important;
+    right: 12px !important;
+  }
+
+  .ai-lang-float button{
+    min-width: 22px !important;
+    width: 22px !important;
+    height: 17px !important;
+    padding: 0 6px !important;
+    font-size: 6.5px !important;
+  }
+  
+  .ai-h1{ 
+    letter-spacing:-.3px; 
+  }
+  
+  .ai-btn{ 
+    width:100%; 
+    justify-content:center; 
+  }
+  
+  .ai-contact{ 
+    justify-content:flex-start; 
+  }
+
+  .ai-3d-wrap{
+    width: 100%;
+  }
+}
+
+@media (hover: none){
+  .ai-item:hover,
+  .ai-card:hover,
+  .ai-profile-card:hover{
+    transform: none;
+  }
+}
