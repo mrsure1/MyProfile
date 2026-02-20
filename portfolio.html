@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0b1220',
+                        card: 'rgba(255, 255, 255, .06)',
+                        border: 'rgba(255, 255, 255, .12)',
+                        text: '#ffffff',
+                        muted: 'rgba(255, 255, 255, .88)',
+                        accent: '#4fd1ff',
+                        'neon-orange': '#ff7a18',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom animations */
+        @keyframes pulse-custom {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .7; transform: scale(0.9); }
+        }
+        .animate-pulse-custom { animation: pulse-custom 2s ease-in-out infinite; }
+
+        /* Reveal Animations */
+        .ai-fade {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .ai-fade.show { opacity: 1; transform: translateY(0); }
+
+        body { background-color: #0b1220; }
+        
+        /* Scrollbar for Portfolio Grid if needed */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0b1220; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4fd1ff; }
+    </style>
+    <title>Portfolio - AI & Robotics</title>
+</head>
+
+<body>
+    <!-- Root for Portfolio Render -->
+    <div id="ai-portfolio-root"></div>
+
+    <!-- Dependencies -->
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="js/lang-data.js"></script>
+    <!-- Reusing main app logic which will detect #ai-portfolio-root -->
+    <script src="js/app_v2.js"></script>
+</body>
+
+</html>

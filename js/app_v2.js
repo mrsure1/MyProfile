@@ -168,6 +168,19 @@
           animation-delay: var(--d, 0ms);
           opacity: 0;
       }
+      
+      /* Marquee Animation */
+      @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.333333%); }
+      }
+      .animate-marquee {
+          animation: marquee 30s linear infinite;
+          width: max-content;
+      }
+      .animate-marquee:hover {
+          animation-play-state: paused;
+      }
   `;
     document.head.appendChild(dynamicStyle);
 
@@ -185,8 +198,10 @@
     }
 
     var root = document.getElementById('ai-landing-root');
-    if (!root) {
-        console.error('❌ #ai-landing-root not found!');
+    var portfolioRoot = document.getElementById('ai-portfolio-root');
+
+    if (!root && !portfolioRoot) {
+        console.error('❌ Root element not found!');
         return;
     }
 
@@ -203,6 +218,31 @@
 
     function $(sel, el) { return (el || document).querySelector(sel); }
     function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
+
+    // --- Portfolio Data ---
+    var portfolioData = [
+        {
+            id: 'p1',
+            title: '안심콜타리',
+            desc: { ko: '치매 환자 보호자를 위한 스마트 안전 알림 앱. 환자 안전 상태 모니터링 및 보호자 연결 서비스.', en: 'Smart safety alert app for dementia caregivers. Real-time patient monitoring and caregiver connection service.' },
+            img: 'img/portfolio_anshim.jpg',
+            tags: ['Mobile App', 'Healthcare', 'AI']
+        },
+        {
+            id: 'p2',
+            title: 'Receipt Master',
+            desc: { ko: '영수증 자동 인식 및 가계부 관리 앱. AI 기반 지출 분류 및 스마트 영수증 정리 솔루션.', en: 'Automatic receipt recognition and expense tracking app. AI-powered spending categorization and receipt management.' },
+            img: 'img/portfolio_receipt.jpg',
+            tags: ['Mobile App', 'FinTech', 'OCR']
+        },
+        {
+            id: 'p3',
+            title: 'PolicyMatch Korea',
+            desc: { ko: '대한민국 정책자금 맞춤 매칭 플랫폼. 소상공인·개인을 위한 정부 지원금 탐색 및 신청 로드맵 서비스.', en: 'Korea policy fund matching platform. Government grant discovery and application roadmap for SMEs and individuals.' },
+            img: 'img/portfolio_policy.png',
+            tags: ['Web App', 'Next.js', 'AI Matching']
+        }
+    ];
 
     function showModal(msg) {
         var existing = document.querySelector('.fixed.z-\\[100\\]');
@@ -392,7 +432,67 @@
         }
     }
 
+    // --- RENDER PORTFOLIO PAGE ---
+    function renderPortfolio() {
+        console.log('🎨 Rendering Portfolio Page...');
+
+        // Header / Nav
+        var nav =
+            '<nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">' +
+            '<a href="index.html" class="text-white font-bold text-xl flex items-center gap-2 hover:text-accent transition-colors"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>' +
+            '<div class="flex gap-4">' +
+            '<button id="btn-ko" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold ' + (lang === 'ko' ? 'bg-accent/30 text-white' : 'text-white/70') + '">KO</button>' +
+            '<button id="btn-en" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold ' + (lang === 'en' ? 'bg-accent/30 text-white' : 'text-white/70') + '">EN</button>' +
+            '</div>' +
+            '</nav>';
+
+        // Grid Items
+        var gridItems = portfolioData.map(function (item) {
+            var tagsHtml = item.tags.map(t => '<span class="text-xs font-mono text-accent bg-accent/10 px-2 py-1 rounded">' + t + '</span>').join('');
+            var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+            return (
+                '<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-transform duration-300">' +
+                '<div class="aspect-video bg-black/50 overflow-hidden relative">' +
+                '<img src="' + item.img + '" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">' +
+                '<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>' +
+                '<div class="absolute bottom-4 left-4 right-4">' +
+                '<h3 class="text-white font-bold text-xl mb-1">' + item.title + '</h3>' +
+                '</div>' +
+                '</div>' +
+                '<div class="p-6">' +
+                '<p class="text-muted text-sm leading-relaxed mb-4">' + desc + '</p>' +
+                '<div class="flex flex-wrap gap-2">' + tagsHtml + '</div>' +
+                '</div>' +
+                '</div>'
+            );
+        }).join('');
+
+        portfolioRoot.innerHTML =
+            nav +
+            '<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto">' +
+            '<h1 class="text-4xl md:text-5xl font-bold text-white mb-8 text-center tracking-tight">Portfolio</h1>' +
+            '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ai-fade show">' +
+            gridItems +
+            '</div>' +
+            '</main>' +
+            '<div class="text-center text-white/40 text-xs pb-8">' + t('footer_note') + '</div>';
+
+        // Bind Lang Buttons
+        var btnKo = $('#btn-ko', portfolioRoot);
+        var btnEn = $('#btn-en', portfolioRoot);
+        if (btnKo) btnKo.addEventListener('click', function () { setLang('ko'); });
+        if (btnEn) btnEn.addEventListener('click', function () { setLang('en'); });
+
+        initGalaxyCursor();
+    }
+
+    // --- RENDER LANDING PAGE ---
     function render() {
+        if (portfolioRoot) {
+            renderPortfolio();
+            return;
+        }
+
         console.log('🎨 Rendering glassmorphic design...');
 
         var expData = [
@@ -441,11 +541,11 @@
             '<button id="btn-en" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold transition-all ' + (lang === 'en' ? 'bg-accent/30 text-white border-accent/60 shadow-lg shadow-accent/30' : 'text-white/70 hover:text-white hover:bg-white/10') + '">EN</button>' +
             '</div>';
 
-        setTimeout(initSplineViewer, 100);
+        // setTimeout(initSplineViewer, 100); // Using Iframe for external Spline URL
 
         root.innerHTML = [
             '<div id="spline-wrapper" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:auto; opacity:0; transition: opacity 1.5s ease;">',
-            '<spline-viewer style="width:100%; height:100%; display:block;"></spline-viewer>',
+            '<iframe src="https://my.spline.design/holographicearthwithdynamiclines-lgNYO4b6WDMRTXq4Vvu4REtA/" frameborder="0" width="100%" height="100%" style="border:none;" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-pointer-lock"></iframe>',
             '</div>',
 
             '<div class="relative w-full overflow-hidden z-20 pointer-events-none">',
@@ -491,6 +591,40 @@
             '</div>',
             '</div>',
 
+            '</div>',
+            '</section>',
+
+            '</div>',
+            '</section>',
+
+            // Portfolio Carousel (New Section)
+            '<section class="relative py-10 overflow-hidden">',
+            '<div class="max-w-[1120px] mx-auto px-6 pointer-events-auto ai-fade">',
+            '<div class="flex justify-between items-end mb-6">',
+            '<h2 class="text-3xl font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Portfolio</h2>',
+            '<a href="portfolio.html" class="text-sm text-accent hover:text-white transition-colors flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></a>',
+            '</div>',
+            // Carousel Container
+            // Carousel Container (Marquee)
+            '<div class="w-full overflow-hidden mask-linear-fade">',
+            '<div class="flex gap-6 animate-marquee">',
+            // Duplicate data 3 times for smooth infinite loop on wide screens
+            [...portfolioData, ...portfolioData, ...portfolioData].map(function (item) {
+                var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+                return (
+                    '<div class="shrink-0 w-[280px] md:w-[320px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-accent/50 transition-colors" onclick="location.href=\'portfolio.html\'">' +
+                    '<div class="h-40 bg-black/50 relative overflow-hidden">' +
+                    '<img src="' + item.img + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">' +
+                    '</div>' +
+                    '<div class="p-4">' +
+                    '<h3 class="text-lg font-bold text-white mb-1 truncate">' + item.title + '</h3>' +
+                    '<p class="text-xs text-white/60 line-clamp-2">' + desc + '</p>' +
+                    '</div>' +
+                    '</div>'
+                );
+            }).join(''),
+            '</div>',
+            '</div>',
             '</div>',
             '</section>',
 
@@ -547,32 +681,44 @@
             '<h2 class="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent">' + t('contact_h2') + '</h2>',
             '<p class="text-white/80 text-lg leading-relaxed mb-8">' + t('contact_lead') + '</p>',
 
-            '<div class="glass-card rounded-2xl p-6 max-w-2xl">',
-            '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">',
-            '<div>',
-            '<label class="block text-sm text-accent font-bold mb-2">' + t('contact_name_label') + '</label>',
-            '<input type="text" id="contact-name" class="w-full p-3 glass-button rounded-lg text-white focus:border-accent focus:outline-none">',
+            '<div class="glass-card rounded-2xl p-8 max-w-2xl mx-auto border border-white/10 shadow-2xl relative overflow-hidden group/form">',
+            '<div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover/form:opacity-100 transition-opacity duration-500 pointer-events-none"></div>',
+
+            // Form Element Wrapper
+            '<form id="contact-form" class="relative z-10">',
+
+            '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">',
+            '<div class="space-y-2">',
+            '<label class="block text-xs font-bold text-accent tracking-wider uppercase ml-1">' + t('contact_name_label') + '</label>',
+            '<input required type="text" id="contact-name" class="w-full p-4 glass-button rounded-xl text-white placeholder-white/30 focus:border-accent focus:bg-white/10 focus:shadow-[0_0_20px_rgba(79,209,255,0.3)] transition-all outline-none" placeholder="Name">',
             '</div>',
-            '<div>',
-            '<label class="block text-sm text-accent font-bold mb-2">' + t('contact_phone_label') + '</label>',
-            '<input type="text" id="contact-phone" class="w-full p-3 glass-button rounded-lg text-white focus:border-accent focus:outline-none">',
+            '<div class="space-y-2">',
+            '<label class="block text-xs font-bold text-accent tracking-wider uppercase ml-1">' + t('contact_phone_label') + '</label>',
+            '<input required type="text" id="contact-phone" class="w-full p-4 glass-button rounded-xl text-white placeholder-white/30 focus:border-accent focus:bg-white/10 focus:shadow-[0_0_20px_rgba(79,209,255,0.3)] transition-all outline-none" placeholder="Phone">',
             '</div>',
             '</div>',
 
-            '<div class="mb-4">',
-            '<label class="block text-sm text-accent font-bold mb-2">' + t('contact_subject_label') + '</label>',
-            '<input type="text" id="contact-subject" class="w-full p-3 glass-button rounded-lg text-white focus:outline-none focus:border-accent">',
+            '<div class="mb-6 space-y-2">',
+            '<label class="block text-xs font-bold text-accent tracking-wider uppercase ml-1">' + t('contact_subject_label') + '</label>',
+            '<input required type="text" id="contact-subject" class="w-full p-4 glass-button rounded-xl text-white placeholder-white/30 focus:border-accent focus:bg-white/10 focus:shadow-[0_0_20px_rgba(79,209,255,0.3)] transition-all outline-none" placeholder="Subject">',
             '</div>',
 
-            '<div class="mb-6">',
-            '<label class="block text-sm text-accent font-bold mb-2">' + t('contact_message_label') + '</label>',
-            '<textarea id="contact-message" rows="4" class="w-full p-3 glass-button rounded-lg text-white focus:border-accent focus:outline-none resize-y"></textarea>',
+            '<div class="mb-8 space-y-2">',
+            '<label class="block text-xs font-bold text-accent tracking-wider uppercase ml-1">' + t('contact_message_label') + '</label>',
+            '<textarea required id="contact-message" rows="5" class="w-full p-4 glass-button rounded-xl text-white placeholder-white/30 focus:border-accent focus:bg-white/10 focus:shadow-[0_0_20px_rgba(79,209,255,0.3)] transition-all outline-none resize-none" placeholder="Message..."></textarea>',
             '</div>',
 
             '<div class="flex justify-center">',
-            '<button id="btn-submit-contact" class="px-8 py-3 rounded-xl text-white font-bold text-base bg-gradient-to-r from-orange-500 to-amber-500 border border-orange-400/60 hover:from-orange-400 hover:to-amber-400 shadow-lg hover:shadow-orange-500/50 transition-all">' + t('contact_submit_btn') + '</button>',
+            '<button type="submit" id="btn-submit-contact" class="group relative px-10 py-4 rounded-xl text-white font-bold text-lg bg-gradient-to-r from-orange-500 to-amber-500 border border-orange-400/60 shadow-[0_4px_20px_rgba(255,122,24,0.4)] hover:shadow-[0_8px_30px_rgba(255,122,24,0.6)] hover:-translate-y-1 active:translate-y-0 transition-all overflow-hidden">',
+            '<span class="relative z-10 flex items-center gap-2">',
+            t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm group-hover:translate-x-1 transition-transform"></i>',
+            '</span>',
+            '<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>',
+            '</button>',
             '</div>',
-            '</div>',
+
+            '</form>', // Close Form
+            '</div>', // Close Glass Card
 
             '<div class="text-white/60 text-xs mt-6 text-center">' + t('footer_note') + '</div>',
             '</div>',
@@ -593,9 +739,11 @@
         if (btnKo) btnKo.addEventListener('click', function () { setLang('ko'); });
         if (btnEn) btnEn.addEventListener('click', function () { setLang('en'); });
 
+        var contactForm = $('#contact-form', root);
         var submitBtn = $('#btn-submit-contact', root);
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function (e) {
+
+        if (contactForm && submitBtn) {
+            contactForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 var subject = $('#contact-subject').value;
@@ -603,15 +751,33 @@
                 var phone = $('#contact-phone').value;
                 var message = $('#contact-message').value;
 
-                if (!subject || !name || !message) {
-                    showModal(lang === 'ko' ? '모든 필수 항목을 입력해주세요.' : 'Please fill in all required fields.');
-                    return;
-                }
+                // Browser handles validation now because of 'required' attribute
+                // Code below runs only if form is valid
+
+                // UI Loading State
+                var originalBtnText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                // Preserve icon by only changing text node if possible, but simplest is to just set HTML
+                submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">Sending... <i class="fa-solid fa-spinner fa-spin text-sm"></i></span>';
+                submitBtn.style.opacity = '0.7';
+                submitBtn.style.cursor = 'not-allowed';
+
+                // Find container (glass-card) - parent of form
+                var container = contactForm.parentNode;
+
+                // Remove any existing status message
+                var existingStatus = container.querySelector('.status-msg');
+                if (existingStatus) existingStatus.remove();
 
                 if (!CONFIG.scriptUrl) {
-                    var mailSubject = encodeURIComponent('[' + t('contact_subject_label') + '] ' + subject);
-                    var body = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone + '\n\n' + message);
-                    window.location.href = 'mailto:' + CONFIG.email + '?subject=' + mailSubject + '&body=' + body;
+                    // Fallback to mailto
+                    window.location.href = 'mailto:' + CONFIG.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(message);
+
+                    // Reset Button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
                     return;
                 }
 
@@ -628,15 +794,38 @@
                     body: formData.toString()
                 })
                     .then(() => {
-                        showModal(lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.');
+                        // Success UI
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+
+                        // Clear form
                         $('#contact-subject').value = '';
                         $('#contact-name').value = '';
                         $('#contact-phone').value = '';
                         $('#contact-message').value = '';
+
+                        // Show Success Message
+                        var successMsg = document.createElement('p');
+                        successMsg.className = 'status-msg text-green-400 text-center mt-4 font-bold animate-pulse';
+                        successMsg.textContent = lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.';
+                        container.appendChild(successMsg);
+
+                        setTimeout(() => { if (successMsg) successMsg.remove(); }, 5000);
                     })
                     .catch(err => {
                         console.error('Error:', err);
-                        showModal(lang === 'ko' ? '전송 실패. 이메일로 직접 문의해주세요.' : 'Failed to send.');
+                        // Error UI
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+
+                        var errorMsg = document.createElement('p');
+                        errorMsg.className = 'status-msg text-red-400 text-center mt-4 font-bold';
+                        errorMsg.textContent = lang === 'ko' ? '전송 실패. 이메일로 직접 문의해주세요.' : 'Failed to send. Please email directly.';
+                        container.appendChild(errorMsg);
                     });
             });
         }
