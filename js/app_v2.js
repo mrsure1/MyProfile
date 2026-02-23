@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     'use strict';
 
     document.documentElement.classList.add('js');
@@ -8,13 +8,11 @@
     dynamicStyle.innerHTML = `
       /* Core Glassmorphism Styles */
       .glass-panel {
-          background: rgba(255, 255, 255, 0.08);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1.5px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4),
-                      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-                      0 0 20px rgba(79, 209, 255, 0.15);
+          background: rgba(255, 255, 255, 0.01);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.15);
           position: relative;
       }
       
@@ -33,7 +31,7 @@
           -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
-          opacity: 0.6;
+          opacity: 0.25;
           pointer-events: none;
       }
       
@@ -201,7 +199,7 @@
     var portfolioRoot = document.getElementById('ai-portfolio-root');
 
     if (!root && !portfolioRoot) {
-        console.error('❌ Root element not found!');
+        console.error('??Root element not found!');
         return;
     }
 
@@ -215,32 +213,121 @@
 
     var dict = {};
     var lang = localStorage.getItem('ai_lang') || CONFIG.defaultLang;
+    var SPLINE_SCENE_URL = 'https://my.spline.design/holographicearthwithdynamiclines-lgNYO4b6WDMRTXq4Vvu4REtA/';
+    var SPLINE_REFRESH_COOLDOWN_MS = 1200;
+    var splineLifecycleBound = false;
+    var splineLastRefreshAt = 0;
+    var splineLastHiddenAt = 0;
 
     function $(sel, el) { return (el || document).querySelector(sel); }
     function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
 
-    // --- Portfolio Data ---
+    // --- ?�트?�리???�이??(?�제 ?�로?�트 기반 ?�세 ?�보 ?�함) ---
     var portfolioData = [
         {
             id: 'p1',
-            title: '안심콜타리',
-            desc: { ko: '치매 환자 보호자를 위한 스마트 안전 알림 앱. 환자 안전 상태 모니터링 및 보호자 연결 서비스.', en: 'Smart safety alert app for dementia caregivers. Real-time patient monitoring and caregiver connection service.' },
-            img: 'img/portfolio_anshim.jpg',
-            tags: ['Mobile App', 'Healthcare', 'AI']
+            title: '안심 알리미 (DementiaGuard)',
+            desc: {
+                ko: '치매 환자 보호자를 위한 스마트 안전 알림 앱입니다. Geofencing 기반 실시간 위치 추적과 긴급 알림 시스템으로 환자 안전을 지킵니다.',
+                en: 'Smart safety alert app for dementia caregivers. Real-time location tracking with Geofencing and emergency alert system.'
+            },
+            img: 'img/portfolio_anshim.png',
+            tags: ['React Native', 'Firebase', 'TypeScript'],
+            techStack: {
+                ko: ['React Native 0.76', 'Firebase (Firestore, FCM, Cloud Functions)', 'react-native-background-geolocation', 'react-native-maps', 'react-native-tts', 'TypeScript'],
+                en: ['React Native 0.76', 'Firebase (Firestore, FCM, Cloud Functions)', 'react-native-background-geolocation', 'react-native-maps', 'react-native-tts', 'TypeScript']
+            },
+            features: {
+                ko: [
+                    'Geofencing 기반 안전지대 이탈 자동 감지',
+                    '백그라운드 실시간 위치 추적 (10m 단위)',
+                    'TTS 긴급 음성 알림 + 시스템 볼륨 자동 최대',
+                    'FCM 푸시 알림으로 보호자에게 긴급 전파',
+                    '보호자용 실시간 지도 및 안전지대 설정'
+                ],
+                en: [
+                    'Auto-detect safe zone exit via Geofencing',
+                    'Background real-time tracking (10m interval)',
+                    'TTS emergency voice alert + auto max volume',
+                    'FCM push notification to caregivers',
+                    'Caregiver real-time map & safe zone management'
+                ]
+            },
+            architecture: {
+                ko: '환자/보호자 이중 앱 구조와 Cloud Functions 기반 서버리스 백엔드로 구성된 Android/iOS 크로스플랫폼 앱',
+                en: 'Dual app (Patient/Caregiver) with Cloud Functions serverless backend and Android/iOS support'
+            },
+            platform: 'Mobile (Android / iOS)'
         },
         {
             id: 'p2',
             title: 'Receipt Master',
-            desc: { ko: '영수증 자동 인식 및 가계부 관리 앱. AI 기반 지출 분류 및 스마트 영수증 정리 솔루션.', en: 'Automatic receipt recognition and expense tracking app. AI-powered spending categorization and receipt management.' },
+            desc: {
+                ko: 'Gemini AI 기반 영수증 자동 인식 및 스마트 가계부 앱입니다. 사진 촬영만으로 지출을 분류하고 통계를 제공합니다.',
+                en: 'Gemini AI-powered receipt scanner and smart expense tracker. Auto-categorize expenses with just a photo.'
+            },
             img: 'img/portfolio_receipt.jpg',
-            tags: ['Mobile App', 'FinTech', 'OCR']
+            tags: ['React', 'Vite', 'Gemini AI'],
+            techStack: {
+                ko: ['React 19 + TypeScript', 'Vite 6', 'Google Gemini AI (@google/genai)', 'Recharts (통계 차트)', 'Lucide React (아이콘)', 'PWA (Service Worker)'],
+                en: ['React 19 + TypeScript', 'Vite 6', 'Google Gemini AI (@google/genai)', 'Recharts (Statistics)', 'Lucide React (Icons)', 'PWA (Service Worker)']
+            },
+            features: {
+                ko: [
+                    'AI 영수증 이미지 분석 (Gemini Vision)',
+                    '자동 카테고리 분류 (식비, 교통, 쇼핑 등 7개)',
+                    '다중 영수증 일괄 업로드 및 큐 처리',
+                    '일/월 지출 통계 대시보드',
+                    'CSV 내보내기 및 PWA 설치 지원'
+                ],
+                en: [
+                    'AI receipt image analysis (Gemini Vision)',
+                    'Auto-categorization (7 categories)',
+                    'Bulk upload with queue processing',
+                    'Daily/Monthly expense dashboard',
+                    'CSV export & PWA installable'
+                ]
+            },
+            architecture: {
+                ko: 'SPA 구조와 LocalStorage 기반 오프라인 데이터 관리, PWA 설치 지원',
+                en: 'SPA architecture with LocalStorage offline data and installable PWA'
+            },
+            platform: 'Web (PWA)'
         },
         {
             id: 'p3',
             title: 'PolicyMatch Korea',
-            desc: { ko: '대한민국 정책자금 맞춤 매칭 플랫폼. 소상공인·개인을 위한 정부 지원금 탐색 및 신청 로드맵 서비스.', en: 'Korea policy fund matching platform. Government grant discovery and application roadmap for SMEs and individuals.' },
-            img: 'img/portfolio_policy.png',
-            tags: ['Web App', 'Next.js', 'AI Matching']
+            desc: {
+                ko: '소상공인과 중소기업을 위한 정부 정책자금 맞춤 매칭 플랫폼입니다. AI 분석으로 최적의 지원금과 보조금을 추천합니다.',
+                en: 'Government policy fund matching platform for SMEs. AI-powered analysis to find optimal grants and subsidies.'
+            },
+            img: 'img/portfolio_policy.jpg',
+            tags: ['Next.js', 'Supabase', 'Gemini AI'],
+            techStack: {
+                ko: ['Next.js 16 (App Router)', 'TypeScript', 'Tailwind CSS 4', 'Supabase (PostgreSQL)', 'Zustand (상태 관리)', 'Gemini AI (정책 분석)', 'Python (데이터 스크래핑)'],
+                en: ['Next.js 16 (App Router)', 'TypeScript', 'Tailwind CSS 4', 'Supabase (PostgreSQL)', 'Zustand (State Mgmt)', 'Gemini AI (Policy Analysis)', 'Python (Data Scraping)']
+            },
+            features: {
+                ko: [
+                    '5단계 온보딩 기반 맞춤 정책 매칭',
+                    'Gemini AI 정책 공고문 자동 메타데이터 추출',
+                    '신청 로드맵 타임라인 UI',
+                    '서류 준비 가이드 및 체크리스트',
+                    'K-Startup / BizInfo 실시간 데이터 연동'
+                ],
+                en: [
+                    '5-step onboarding for personalized policy matching',
+                    'Gemini AI auto-extraction of policy metadata',
+                    'Application roadmap timeline UI',
+                    'Document preparation guide & checklist',
+                    'K-Startup / BizInfo real-time data integration'
+                ]
+            },
+            architecture: {
+                ko: 'Server/Client Components 하이브리드 구조와 Supabase, Python 스크래핑 파이프라인',
+                en: 'Server + Client Components hybrid with Supabase and Python scraping pipeline'
+            },
+            platform: 'Web (Responsive)'
         }
     ];
 
@@ -275,20 +362,20 @@
     }
 
     function loadDict(nextLang) {
-        console.log('📥 Loading dictionary:', nextLang);
+        console.log('?�� Loading dictionary:', nextLang);
         return new Promise(function (resolve) {
             var attempts = 0;
             var interval = setInterval(function () {
                 if (window.AI_LANG_DATA && window.AI_LANG_DATA[nextLang]) {
                     clearInterval(interval);
                     dict = window.AI_LANG_DATA[nextLang];
-                    console.log('✅ Dictionary loaded:', nextLang);
+                    console.log('??Dictionary loaded:', nextLang);
                     resolve(true);
                 } else {
                     attempts++;
                     if (attempts > 50) {
                         clearInterval(interval);
-                        console.warn('⚠️ Dictionary load timeout');
+                        console.warn('?�️ Dictionary load timeout');
                         resolve(false);
                     }
                 }
@@ -304,7 +391,7 @@
         if (next === lang) return;
         lang = next;
         localStorage.setItem('ai_lang', lang);
-        console.log('🌍 Language changed to:', lang);
+        console.log('?�� Language changed to:', lang);
         loadDict(lang).then(function () { render(); });
     }
 
@@ -320,38 +407,29 @@
 
     function bindMotion() {
         var expSection = $('#experience', root);
-        if (expSection) {
-            var items = $$('.group', expSection);
-            var expObs = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (!entry.isIntersecting) return;
-                    items.forEach(function (el, idx) {
-                        el.style.setProperty('--d', (idx * 120) + 'ms');
+        if (!expSection) return;
+        var items = $$('.ai-item', expSection);
+
+        items.forEach(function (el, i) {
+            el.style.setProperty('--d', (i * 120) + 'ms');
+        });
+
+        var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    $$('.ai-item', entry.target).forEach(function (el) {
                         el.classList.add('cascade-show');
                     });
-                    expObs.disconnect();
-                });
-            }, { threshold: 0.15 });
-            expObs.observe(expSection);
-        }
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
 
-        $$('button, .ai-btn, a[class*="rounded"]', root).forEach(function (btn) {
-            if (btn.__btnGlowBound) return;
-            btn.__btnGlowBound = true;
-
-            btn.addEventListener('mousemove', function (e) {
-                var r = btn.getBoundingClientRect();
-                if (!r.width || !r.height) return;
-                var x = ((e.clientX - r.left) / r.width) * 100;
-                var y = ((e.clientY - r.top) / r.height) * 100;
-                btn.style.setProperty('--mx', x + '%');
-                btn.style.setProperty('--my', y + '%');
-            }, { passive: true });
-        });
+        obs.observe(expSection);
     }
 
     function initGalaxyCursor() {
-        console.log('✨ Initializing Galaxy Cursor...');
+        console.log('??Initializing Galaxy Cursor...');
         var cursor = document.createElement('div');
         cursor.className = 'ai-cursor-head';
         document.body.appendChild(cursor);
@@ -398,45 +476,13 @@
         });
     }
 
-    function initSplineViewer() {
-        if (window.SPLINE_DATA) {
-            try {
-                var existingViewer = document.querySelector('spline-viewer');
-                if (existingViewer && existingViewer.getAttribute('url')) return;
 
-                console.log('📦 Initializing Spline Viewer...');
-                var u8 = new Uint8Array(window.SPLINE_DATA);
-                var blob = new Blob([u8], { type: 'application/octet-stream' });
-                var url = URL.createObjectURL(blob);
-                var viewer = document.querySelector('spline-viewer');
-                if (viewer) {
-                    viewer.setAttribute('url', url);
-                    console.log('✅ Spline Viewer loaded');
 
-                    const hideLogo = () => {
-                        if (viewer.shadowRoot) {
-                            const style = document.createElement('style');
-                            style.textContent = '#logo, a[href*="spline.design"] { display: none !important; }';
-                            viewer.shadowRoot.appendChild(style);
-                        } else {
-                            setTimeout(hideLogo, 100);
-                        }
-                    };
-                    hideLogo();
-                }
-            } catch (e) {
-                console.error('❌ Spline error:', e);
-            }
-        } else {
-            setTimeout(initSplineViewer, 100);
-        }
-    }
-
-    // --- RENDER PORTFOLIO PAGE ---
+    // --- ?�트?�리???�이지 ?�더�?(?�세 카드 ?�함) ---
     function renderPortfolio() {
-        console.log('🎨 Rendering Portfolio Page...');
+        console.log('?�� Rendering Portfolio Page...');
 
-        // Header / Nav
+        // ?�단 ?�비게이??�?
         var nav =
             '<nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">' +
             '<a href="index.html" class="text-white font-bold text-xl flex items-center gap-2 hover:text-accent transition-colors"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>' +
@@ -446,22 +492,79 @@
             '</div>' +
             '</nav>';
 
-        // Grid Items
-        var gridItems = portfolioData.map(function (item) {
-            var tagsHtml = item.tags.map(t => '<span class="text-xs font-mono text-accent bg-accent/10 px-2 py-1 rounded">' + t + '</span>').join('');
+        // �??�트?�리????��???�세 카드�??�더�?
+        var detailCards = portfolioData.map(function (item, idx) {
             var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+            var techList = (lang === 'ko' ? item.techStack.ko : item.techStack.en);
+            var featList = (lang === 'ko' ? item.features.ko : item.features.en);
+            var arch = lang === 'ko' ? item.architecture.ko : item.architecture.en;
+
+            // 기술 ?�택 ?�그 HTML
+            var techHtml = techList.map(function (t) {
+                return '<span class="text-xs font-mono bg-accent/10 text-accent px-2.5 py-1 rounded-lg border border-accent/20">' + t + '</span>';
+            }).join('');
+
+            // 주요 기능 리스??HTML
+            var featHtml = featList.map(function (f) {
+                return '<li class="flex gap-2 items-start">' +
+                    '<i class="fa-solid fa-bolt text-neon-orange text-xs mt-1 shrink-0"></i>' +
+                    '<span class="text-white/80 text-sm">' + f + '</span>' +
+                    '</li>';
+            }).join('');
+
+            // ?�그 ?�벨 HTML
+            var tagsHtml = item.tags.map(function (tg) {
+                return '<span class="text-xs font-bold text-white bg-white/10 px-3 py-1 rounded-full">' + tg + '</span>';
+            }).join('');
+
+            // ?��?지�??�쪽/?�른�?교차 배치 (짝수: ?��?지 ?�쪽, ?�?? ?��?지 ?�른�?
+            var isEven = idx % 2 === 0;
+
+            var imageBlock =
+                '<div class="w-full lg:w-2/5 shrink-0">' +
+                '<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-lg">' +
+                '<img src="' + item.img + '" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="' + item.title + '">' +
+                '</div>' +
+                '<div class="flex gap-2 mt-3 flex-wrap">' + tagsHtml + '</div>' +
+                '<p class="text-white/40 text-xs mt-2"><i class="fa-solid fa-display mr-1"></i>' + item.platform + '</p>' +
+                '</div>';
+
+            var infoBlock =
+                '<div class="flex-1 space-y-5">' +
+                '<div>' +
+                '<h2 class="text-2xl md:text-3xl font-bold text-white mb-2">' + item.title + '</h2>' +
+                '<p class="text-white/70 text-base leading-relaxed">' + desc + '</p>' +
+                '</div>' +
+
+                // 주요 기능 ?�션
+                '<div>' +
+                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-star mr-1.5"></i>' + (lang === 'ko' ? '주요 기능' : 'Key Features') + '</h3>' +
+                '<ul class="space-y-2">' + featHtml + '</ul>' +
+                '</div>' +
+
+                // ?�키?�처 ?�징 ?�션
+                '<div class="glass-button rounded-xl p-4 border border-white/10">' +
+                '<h3 class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-1.5"><i class="fa-solid fa-cubes mr-1.5"></i>' + (lang === 'ko' ? '?�키?�처' : 'Architecture') + '</h3>' +
+                '<p class="text-white/60 text-sm">' + arch + '</p>' +
+                '</div>' +
+
+                // 기술 ?�택 ?�션
+                '<div>' +
+                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-code mr-1.5"></i>' + (lang === 'ko' ? '기술 ?�택' : 'Tech Stack') + '</h3>' +
+                '<div class="flex flex-wrap gap-2">' + techHtml + '</div>' +
+                '</div>' +
+
+                '</div>';
+
+            // ?�이?�웃: 짝수/?�??교차
+            var innerHtml = isEven
+                ? imageBlock + infoBlock
+                : infoBlock + imageBlock;
+
             return (
-                '<div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-transform duration-300">' +
-                '<div class="aspect-video bg-black/50 overflow-hidden relative">' +
-                '<img src="' + item.img + '" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">' +
-                '<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>' +
-                '<div class="absolute bottom-4 left-4 right-4">' +
-                '<h3 class="text-white font-bold text-xl mb-1">' + item.title + '</h3>' +
-                '</div>' +
-                '</div>' +
-                '<div class="p-6">' +
-                '<p class="text-muted text-sm leading-relaxed mb-4">' + desc + '</p>' +
-                '<div class="flex flex-wrap gap-2">' + tagsHtml + '</div>' +
+                '<div id="' + item.id + '" class="glass-panel glass-glow rounded-3xl p-6 md:p-10 ai-fade scroll-mt-32">' +
+                '<div class="flex flex-col lg:flex-row gap-8 items-start">' +
+                innerHtml +
                 '</div>' +
                 '</div>'
             );
@@ -469,23 +572,146 @@
 
         portfolioRoot.innerHTML =
             nav +
-            '<main class="pt-24 pb-20 px-6 max-w-7xl mx-auto">' +
-            '<h1 class="text-4xl md:text-5xl font-bold text-white mb-8 text-center tracking-tight">Portfolio</h1>' +
-            '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ai-fade show">' +
-            gridItems +
-            '</div>' +
+            '<main class="pt-24 pb-20 px-6 max-w-6xl mx-auto space-y-10">' +
+            '<h1 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center tracking-tight">Portfolio</h1>' +
+            '<p class="text-white/50 text-center text-lg mb-8">' + (lang === 'ko' ? '직접 기획?�고 개발???�로?�트?�입?�다.' : 'Projects I planned and built myself.') + '</p>' +
+            detailCards +
             '</main>' +
             '<div class="text-center text-white/40 text-xs pb-8">' + t('footer_note') + '</div>';
 
-        // Bind Lang Buttons
+        // ?�어 ?�환 버튼 ?�벤??바인??
         var btnKo = $('#btn-ko', portfolioRoot);
         var btnEn = $('#btn-en', portfolioRoot);
         if (btnKo) btnKo.addEventListener('click', function () { setLang('ko'); });
         if (btnEn) btnEn.addEventListener('click', function () { setLang('en'); });
 
+        // ?�크�????�이?�인 ?�니메이???�용
+        var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) e.target.classList.add('show');
+            });
+        }, { threshold: 0.1 });
+        $$('.ai-fade', portfolioRoot).forEach(function (el) { obs.observe(el); });
+
         initGalaxyCursor();
+        initSplineBackground();
+
+        // [?�규 추�?] ?�이지 ?�적 로딩 ???�커 ?�치�??�동 ?�크�?
+        if (window.location.hash) {
+            setTimeout(function () {
+                var targetId = window.location.hash.substring(1);
+                var targetEl = document.getElementById(targetId);
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        }
     }
 
+    // --- Spline 3D 배경 초기??(?�공??링크�?Iframe?�로 ?�용) ---
+    function buildSplineSrc(forceRefresh) {
+        if (forceRefresh) return SPLINE_SCENE_URL + '?r=' + Date.now();
+        return SPLINE_SCENE_URL;
+    }
+
+    function showSplineWrapper(sw, isFallback) {
+        if (!sw) return;
+        sw.style.opacity = '1';
+        if (isFallback) {
+            console.warn('?�️ Spline load delayed - showing wrapper anyway');
+        }
+    }
+
+    function bindSplineIframeLoad(ifr, sw) {
+        ifr.onload = function () {
+            setTimeout(function () {
+                showSplineWrapper(sw, false);
+                console.log('??Spline iframe loaded');
+            }, 350);
+        };
+
+        setTimeout(function () {
+            if (sw && sw.style.opacity !== '1') {
+                showSplineWrapper(sw, true);
+            }
+        }, 10000);
+    }
+
+    function refreshSplineBackground(reason) {
+        var sw = document.getElementById('spline-wrapper');
+        var ifr = document.getElementById('spline-bg');
+        if (!sw || !ifr) return;
+
+        var now = Date.now();
+        if (now - splineLastRefreshAt < SPLINE_REFRESH_COOLDOWN_MS) return;
+        splineLastRefreshAt = now;
+
+        sw.style.opacity = '0';
+        bindSplineIframeLoad(ifr, sw);
+        ifr.src = buildSplineSrc(true);
+        console.log('?�� Spline refreshed:', reason || 'manual');
+    }
+
+    function bindSplineLifecycleEvents() {
+        if (splineLifecycleBound) return;
+        splineLifecycleBound = true;
+
+        window.addEventListener('pageshow', function (evt) {
+            // BFCache restore can freeze WebGL inside iframe.
+            if (evt.persisted) {
+                setTimeout(function () {
+                    refreshSplineBackground('pageshow-bfcache');
+                }, 120);
+            }
+        });
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'hidden') {
+                splineLastHiddenAt = Date.now();
+                return;
+            }
+
+            if (Date.now() - splineLastHiddenAt > 800) {
+                setTimeout(function () {
+                    refreshSplineBackground('visibility-visible');
+                }, 120);
+            }
+        });
+    }
+
+    function initSplineBackground(options) {
+        var opts = options || {};
+        var forceRefresh = !!opts.forceRefresh;
+        var sw = document.getElementById('spline-wrapper');
+        var ifr = document.getElementById('spline-bg');
+
+        bindSplineLifecycleEvents();
+
+        if (sw && ifr) {
+            if (forceRefresh) refreshSplineBackground(opts.reason || 'force');
+            return;
+        }
+
+        if (sw && !ifr) sw.remove();
+
+        console.log('?�� Initializing Spline background...');
+        sw = document.createElement('div');
+        sw.id = 'spline-wrapper';
+        sw.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; background:#0b1220; opacity:0; transition: opacity 1.2s ease-in-out;";
+
+        ifr = document.createElement('iframe');
+        ifr.id = 'spline-bg';
+        ifr.src = buildSplineSrc(false);
+        ifr.frameBorder = '0';
+        ifr.allow = 'autoplay; fullscreen';
+        ifr.style.width = '100%';
+        ifr.style.height = '100%';
+        ifr.style.display = 'block';
+
+        sw.appendChild(ifr);
+        document.body.prepend(sw);
+        bindSplineIframeLoad(ifr, sw);
+    }
     // --- RENDER LANDING PAGE ---
     function render() {
         if (portfolioRoot) {
@@ -493,7 +719,7 @@
             return;
         }
 
-        console.log('🎨 Rendering glassmorphic design...');
+        console.log('?�� Rendering glassmorphic design...');
 
         var expData = [
             ['exp1_t', 'exp1_d', 'fa-laptop-code'],
@@ -544,10 +770,6 @@
         // setTimeout(initSplineViewer, 100); // Using Iframe for external Spline URL
 
         root.innerHTML = [
-            '<div id="spline-wrapper" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:auto; opacity:0; transition: opacity 1.5s ease;">',
-            '<iframe src="https://my.spline.design/holographicearthwithdynamiclines-lgNYO4b6WDMRTXq4Vvu4REtA/" frameborder="0" width="100%" height="100%" style="border:none;" allow="autoplay; fullscreen; xr-spatial-tracking" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-pointer-lock"></iframe>',
-            '</div>',
-
             '<div class="relative w-full overflow-hidden z-20 pointer-events-none">',
             langFloat,
 
@@ -612,7 +834,7 @@
             [...portfolioData, ...portfolioData, ...portfolioData].map(function (item) {
                 var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
                 return (
-                    '<div class="shrink-0 w-[280px] md:w-[320px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-accent/50 transition-colors" onclick="location.href=\'portfolio.html\'">' +
+                    '<div class="shrink-0 w-[280px] md:w-[320px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-accent/50 transition-colors" onclick="location.href=\'portfolio.html#' + item.id + '\'">' +
                     '<div class="h-40 bg-black/50 relative overflow-hidden">' +
                     '<img src="' + item.img + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">' +
                     '</div>' +
@@ -681,7 +903,8 @@
             '<h2 class="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent">' + t('contact_h2') + '</h2>',
             '<p class="text-white/80 text-lg leading-relaxed mb-8">' + t('contact_lead') + '</p>',
 
-            '<div class="glass-card rounded-2xl p-8 max-w-2xl mx-auto border border-white/10 shadow-2xl relative overflow-hidden group/form">',
+            // ??카드 - ?�쪽 ?�렬 (mx-auto ?�거)
+            '<div class="glass-card rounded-2xl p-8 max-w-2xl border border-white/10 shadow-2xl relative overflow-hidden group/form">',
             '<div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover/form:opacity-100 transition-opacity duration-500 pointer-events-none"></div>',
 
             // Form Element Wrapper
@@ -721,18 +944,16 @@
             '</div>', // Close Glass Card
 
             '<div class="text-white/60 text-xs mt-6 text-center">' + t('footer_note') + '</div>',
-            '</div>',
-            '</div>',
+            '</div>', // Close Glass Panel
+            '</div>', // Close Section Container
             '</section>',
 
             '</main>',
             '</div>'
         ].join('');
 
-        setTimeout(function () {
-            var sw = document.getElementById('spline-wrapper');
-            if (sw) sw.style.opacity = '1';
-        }, 1000);
+
+        initSplineBackground();
 
         var btnKo = $('#btn-ko', root);
         var btnEn = $('#btn-en', root);
@@ -809,7 +1030,7 @@
                         // Show Success Message
                         var successMsg = document.createElement('p');
                         successMsg.className = 'status-msg text-green-400 text-center mt-4 font-bold animate-pulse';
-                        successMsg.textContent = lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.';
+                        successMsg.textContent = lang === 'ko' ? '문의가 ?�공?�으�??�송?�었?�니??' : 'Your inquiry was sent successfully.';
                         container.appendChild(successMsg);
 
                         setTimeout(() => { if (successMsg) successMsg.remove(); }, 5000);
@@ -824,7 +1045,7 @@
 
                         var errorMsg = document.createElement('p');
                         errorMsg.className = 'status-msg text-red-400 text-center mt-4 font-bold';
-                        errorMsg.textContent = lang === 'ko' ? '전송 실패. 이메일로 직접 문의해주세요.' : 'Failed to send. Please email directly.';
+                        errorMsg.textContent = lang === 'ko' ? '?�송 ?�패. ?�메?�로 직접 문의?�주?�요.' : 'Failed to send. Please email directly.';
                         container.appendChild(errorMsg);
                     });
             });
@@ -834,10 +1055,10 @@
         bindMotion();
         initGalaxyCursor();
 
-        console.log('✅ Glassmorphic Landing Page Loaded');
+        console.log('??Glassmorphic Landing Page Loaded');
     }
 
-    console.log('🚀 Initializing...');
+    console.log('?? Initializing...');
     loadDict(lang)
         .then(function (loaded) {
             if (!loaded) dict = {};
@@ -847,7 +1068,8 @@
                 render();
             } catch (e) {
                 console.error('ERROR:', e);
-                alert('오류: ' + e.message);
+                alert('?�류: ' + e.message);
             }
         });
 })();
+
