@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     document.documentElement.classList.add('js');
@@ -6,12 +6,12 @@
     // Enhanced CSS for comprehensive glassmorphic design
     var dynamicStyle = document.createElement('style');
     dynamicStyle.innerHTML = `
-      /* Core Glassmorphism Styles */
+      /* Core Glassmorphism Styles - 유리처럼 살짝 불투명, 배경 로봇은 비치도록 */
       .glass-panel {
-          background: rgba(255, 255, 255, 0.01);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.15);
           position: relative;
       }
@@ -31,7 +31,7 @@
           -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
-          opacity: 0.25;
+          opacity: 0.35;
           pointer-events: none;
       }
       
@@ -79,21 +79,33 @@
       }
       
       .glass-card {
-          background: rgba(255, 255, 255, 0.06);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
-                      inset 0 0 20px rgba(255, 255, 255, 0.03);
+          background: rgba(255, 255, 255, 0.10);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25),
+                      inset 0 0 20px rgba(255, 255, 255, 0.04);
           transition: all 0.3s ease;
       }
       
       .glass-card:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.14);
           border-color: rgba(79, 209, 255, 0.4);
           box-shadow: 0 8px 24px rgba(79, 209, 255, 0.3),
-                      inset 0 0 30px rgba(255, 255, 255, 0.05);
+                      inset 0 0 30px rgba(255, 255, 255, 0.06);
           transform: translateY(-4px);
       }
+
+      /* Hero에서만 로봇 추적(여백에서 통과). 아래 섹션은 인터랙션(클릭/폼) 우선 */
+      #ai-landing-root main section { pointer-events: none; }
+      .glass-panel, .glass-card { pointer-events: none; }
+      .glass-panel a, .glass-panel button, .glass-panel input, .glass-panel textarea, .glass-panel select, .glass-panel label,
+      .glass-panel [onclick],
+      .glass-card a, .glass-card button, .glass-card input, .glass-card textarea, .glass-card select, .glass-card label,
+      .glass-card [onclick], .glass-card[onclick] { pointer-events: auto; }
+      /* 캐러셀: 래퍼 div는 터치 통과, 링크·카드(onclick)만 클릭 */
+      #carousel-section * { pointer-events: none; }
+      #carousel-section a, #carousel-section [onclick] { pointer-events: auto; }
 
       .ai-item { 
           transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
@@ -179,6 +191,60 @@
       .animate-marquee:hover {
           animation-play-state: paused;
       }
+
+      /* Portfolio fallback spark background */
+      .spark-bg {
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          pointer-events: none;
+          overflow: hidden;
+          /* 살짝 더 밝고 푸른 톤의 배경으로 조정 */
+          background:
+              radial-gradient(circle at 20% 20%, rgba(79, 209, 255, 0.30), transparent 48%),
+              radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.26), transparent 45%),
+              radial-gradient(circle at 50% 80%, rgba(255, 122, 24, 0.22), transparent 47%),
+              linear-gradient(160deg, #060b1a 0%, #0f172a 55%, #1f2937 100%);
+      }
+
+      .spark-layer {
+          position: absolute;
+          inset: -25%;
+          background:
+              radial-gradient(circle, rgba(255, 255, 255, 0.18) 0, transparent 58%) 12% 22% / 22% 22% no-repeat,
+              radial-gradient(circle, rgba(79, 209, 255, 0.2) 0, transparent 55%) 65% 35% / 20% 20% no-repeat,
+              radial-gradient(circle, rgba(255, 122, 24, 0.16) 0, transparent 58%) 35% 70% / 24% 24% no-repeat;
+          filter: blur(8px);
+          animation: sparkWave 9s ease-in-out infinite alternate;
+      }
+
+      .spark-dot {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.9);
+          box-shadow:
+              0 0 10px rgba(79, 209, 255, 0.7),
+              0 0 18px rgba(167, 139, 250, 0.45);
+          animation: sparkDrift 6s linear infinite, sparkPulse 2.6s ease-in-out infinite;
+      }
+
+      @keyframes sparkWave {
+          0% { transform: translate3d(-1%, -1%, 0) scale(1); opacity: 0.68; }
+          100% { transform: translate3d(1%, 1%, 0) scale(1.08); opacity: 1; }
+      }
+
+      @keyframes sparkDrift {
+          0% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(0, -24px, 0); }
+          100% { transform: translate3d(0, -48px, 0); }
+      }
+
+      @keyframes sparkPulse {
+          0%, 100% { opacity: 0.35; }
+          50% { opacity: 1; }
+      }
   `;
     document.head.appendChild(dynamicStyle);
 
@@ -199,7 +265,7 @@
     var portfolioRoot = document.getElementById('ai-portfolio-root');
 
     if (!root && !portfolioRoot) {
-        console.error('??Root element not found!');
+        console.error('Root element not found!');
         return;
     }
 
@@ -213,16 +279,33 @@
 
     var dict = {};
     var lang = localStorage.getItem('ai_lang') || CONFIG.defaultLang;
-    var SPLINE_SCENE_URL = 'https://my.spline.design/holographicearthwithdynamiclines-lgNYO4b6WDMRTXq4Vvu4REtA/';
+    var SPLINE_SCENE_URL = 'https://my.spline.design/nexbotrobotcharacterconcept-LWKC4r0rScgYpKlL2qTm6r4o/';
     var SPLINE_REFRESH_COOLDOWN_MS = 1200;
+    var SPLINE_RECOVERY_DEBOUNCE_MS = 2500;
     var splineLifecycleBound = false;
     var splineLastRefreshAt = 0;
+    var splineLastRecoveryAt = 0;
+    var splineLastRecoveryReason = '';
     var splineLastHiddenAt = 0;
-
+    var splineRecoveryToken = 0;
+    var splineInitializedAt = 0;
+    var aiCarouselTimer = null;
     function $(sel, el) { return (el || document).querySelector(sel); }
     function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
+    function debugLog() {}
+    function logSplineDomState() {}
+    var AI_CAROUSEL_ROTATION = [
+        'img/img2/interior4.png',
+        'img/img2/creature1.png',
+        'img/img2/product3.png',
+        'img/img2/coloringbook2.png',
+        'img/img2/logo5.png'
+    ];
+    function getPortfolioThumb(item) {
+        return Array.isArray(item.img) ? item.img[0] : item.img;
+    }
 
-    // --- ?�트?�리???�이??(?�제 ?�로?�트 기반 ?�세 ?�보 ?�함) ---
+    // --- 포트폴리오 데이터 (실제 프로젝트 기반 상세 정보 포함) ---
     var portfolioData = [
         {
             id: 'p1',
@@ -328,6 +411,80 @@
                 en: 'Server + Client Components hybrid with Supabase and Python scraping pipeline'
             },
             platform: 'Web (Responsive)'
+        },
+        {
+            id: 'p4',
+            title: 'IT News Hub',
+            desc: {
+                ko: '매일 국내외 최신 IT, AI 뉴스를 모아볼 수 있는 자동화 뉴스 플랫폼입니다.',
+                en: 'Automated news platform collecting the latest domestic and international IT & AI news daily.'
+            },
+            img: 'img/portfolio_itnews.png',
+            liveUrl: 'https://mrsure1.github.io/itnews/',
+            tags: ['Python', 'GitHub Actions', 'Tailwind CSS'],
+            techStack: {
+                ko: ['Python', 'BeautifulSoup4 / RSS', 'GitHub Actions (자동 업데이트)', 'HTML5 / JS', 'Tailwind CSS'],
+                en: ['Python', 'BeautifulSoup4 / RSS', 'GitHub Actions (Auto update)', 'HTML5 / JS', 'Tailwind CSS']
+            },
+            features: {
+                ko: [
+                    '국내외 핵심 IT/AI 뉴스 실시간 크롤링',
+                    'GitHub Actions 기반 완전 자동화 파이프라인',
+                    '모바일 친화적 반응형 UI 디자인',
+                    'Gemini AI 기반 글로벌 뉴스 한국어 자동 번역 제공',
+                    '최근 7일치 뉴스 데이터 보관 및 조회'
+                ],
+                en: [
+                    'Real-time crawling of core IT/AI news',
+                    'Fully automated pipeline via GitHub Actions',
+                    'Mobile-friendly responsive UI design',
+                    'Auto-translation of global news via Gemini AI',
+                    '7-day news data retention and viewing'
+                ]
+            },
+            architecture: {
+                ko: 'Python 스크래핑 봇과 GitHub Actions를 활용한 Serverless 정적 웹 배포 아키텍처',
+                en: 'Serverless static web deployment architecture using Python scraping bot and GitHub Actions'
+            },
+            platform: 'Web (Static SPA)'
+        },
+        {
+            id: 'p5',
+            title: 'Generative AI Art Gallery',
+            desc: {
+                ko: 'Midjourney 등 생성형 AI를 활용하여 기획 및 제작한 다양한 컨셉의 아트워크 갤러리입니다.',
+                en: 'Gallery of various conceptual artworks planned and created using Generative AI like Midjourney.'
+            },
+            img: ['img/img2/interior4.png', 'img/img2/product3.png', 'img/img2/creature5.png'],
+            tags: ['Generative AI', 'Midjourney', 'Prompt Engineering'],
+            techStack: {
+                ko: ['Midjourney (v5 & v6) / Niji', 'Prompt Engineering', 'Photoshop'],
+                en: ['Midjourney (v5 & v6) / Niji', 'Prompt Engineering', 'Photoshop']
+            },
+            features: {
+                ko: [
+                    '인테리어, 제품 디자인, 크리처 등 다양한 테마의 컨셉 아트',
+                    '조명(Lighting) 및 재질(Material) 제어를 통한 실사급 렌더링 연출',
+                    'Midjourney 고급 파라미터(--stylize, --chaos 등) 활용'
+                ],
+                en: [
+                    'Concept art for various themes including interior, product design, and creatures',
+                    'Photorealistic quality rendering through lighting and material control',
+                    'Utilization of advanced Midjourney parameters (--stylize, --chaos, etc.)'
+                ]
+            },
+            architecture: {
+                ko: '텍스트 프롬프트를 시각적 결과물로 변환하기 위한 반복적인 파라미터 테스트 및 베리에이션 도출 프로세스',
+                en: 'Iterative parameter testing and variation derivation process to convert text prompts into visual outputs'
+            },
+            platform: 'Generative Art',
+            gallery: [
+                { category: 'Interior Design', images: ['img/img2/interior4.png', 'img/img2/interior.png', 'img/img2/interior3.png', 'img/img2/interior2.png', 'img/img2/interior5.png', 'img/img2/interior6.png'] },
+                { category: 'Product Layout', images: ['img/img2/product3.png', 'img/img2/product1.png', 'img/img2/product2.png', 'img/img2/product4.png'] },
+                { category: 'Characters & Creatures', images: ['img/img2/creature5.png', 'img/img2/creature1.png', 'img/img2/creature2.png', 'img/img2/charactor5.png', 'img/img2/charictor1.png', 'img/img2/charictor2.png', 'img/img2/charictor3.png', 'img/img2/charictor4.png', 'img/img2/charictor5.png', 'img/img2/charictor7.png'] },
+                { category: 'Logos', images: ['img/img2/logo1.png', 'img/img2/logo2.png', 'img/img2/logo3.png', 'img/img2/logo4.png', 'img/img2/logo5.png', 'img/img2/logo6.png', 'img/img2/logo7.png', 'img/img2/logo8.png', 'img/img2/logo9.png'] },
+                { category: 'Coloring Book', images: ['img/img2/coloringbook1.png', 'img/img2/coloringbook2.png'] }
+            ]
         }
     ];
 
@@ -362,20 +519,20 @@
     }
 
     function loadDict(nextLang) {
-        console.log('?�� Loading dictionary:', nextLang);
+        console.log('Loading dictionary:', nextLang);
         return new Promise(function (resolve) {
             var attempts = 0;
             var interval = setInterval(function () {
                 if (window.AI_LANG_DATA && window.AI_LANG_DATA[nextLang]) {
                     clearInterval(interval);
                     dict = window.AI_LANG_DATA[nextLang];
-                    console.log('??Dictionary loaded:', nextLang);
+                    console.log('Dictionary loaded:', nextLang);
                     resolve(true);
                 } else {
                     attempts++;
                     if (attempts > 50) {
                         clearInterval(interval);
-                        console.warn('?�️ Dictionary load timeout');
+                        console.warn('Dictionary load timeout');
                         resolve(false);
                     }
                 }
@@ -391,7 +548,7 @@
         if (next === lang) return;
         lang = next;
         localStorage.setItem('ai_lang', lang);
-        console.log('?�� Language changed to:', lang);
+        console.log('Language changed to:', lang);
         loadDict(lang).then(function () { render(); });
     }
 
@@ -428,8 +585,41 @@
         obs.observe(expSection);
     }
 
+    function initAICarouselRotation(scopeEl) {
+        if (aiCarouselTimer) {
+            clearInterval(aiCarouselTimer);
+            aiCarouselTimer = null;
+        }
+
+        var rotateImages = $$('img[data-ai-rotate="true"]', scopeEl);
+        if (!rotateImages.length) return;
+
+        rotateImages.forEach(function (img, cardIdx) {
+            img.dataset.rotateIndex = String(cardIdx % AI_CAROUSEL_ROTATION.length);
+            img.src = AI_CAROUSEL_ROTATION[Number(img.dataset.rotateIndex)];
+            img.style.opacity = '1';
+            img.style.transition = 'opacity 360ms ease-in-out';
+        });
+
+        aiCarouselTimer = setInterval(function () {
+            rotateImages.forEach(function (img) {
+                var next = (Number(img.dataset.rotateIndex || '0') + 1) % AI_CAROUSEL_ROTATION.length;
+                img.style.opacity = '0';
+
+                setTimeout(function () {
+                    if (!img.isConnected) return;
+                    img.dataset.rotateIndex = String(next);
+                    img.src = AI_CAROUSEL_ROTATION[next];
+                    requestAnimationFrame(function () {
+                        img.style.opacity = '1';
+                    });
+                }, 220);
+            });
+        }, 1800);
+    }
+
     function initGalaxyCursor() {
-        console.log('??Initializing Galaxy Cursor...');
+        console.log('Initializing Galaxy Cursor...');
         var cursor = document.createElement('div');
         cursor.className = 'ai-cursor-head';
         document.body.appendChild(cursor);
@@ -478,33 +668,41 @@
 
 
 
-    // --- ?�트?�리???�이지 ?�더�?(?�세 카드 ?�함) ---
+    // --- 포트폴리오 페이지 렌더링 (상세 카드 포함) ---
     function renderPortfolio() {
-        console.log('?�� Rendering Portfolio Page...');
+        console.log('Rendering Portfolio Page...');
 
-        // ?�단 ?�비게이??�?
+        // 상단 내비게이션
         var nav =
             '<nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">' +
-            '<a href="index.html" class="text-white font-bold text-xl flex items-center gap-2 hover:text-accent transition-colors"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>' +
+            '<a href="index.html" class="text-white font-bold text-xl flex items-center gap-2 hover:text-accent transition-colors"><i class="fa-solid fa-arrow-left"></i> ' + (lang === 'ko' ? '홈으로 돌아가기' : 'Back to Home') + '</a>' +
             '<div class="flex gap-4">' +
             '<button id="btn-ko" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold ' + (lang === 'ko' ? 'bg-accent/30 text-white' : 'text-white/70') + '">KO</button>' +
             '<button id="btn-en" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold ' + (lang === 'en' ? 'bg-accent/30 text-white' : 'text-white/70') + '">EN</button>' +
             '</div>' +
             '</nav>';
 
-        // �??�트?�리????��???�세 카드�??�더�?
+        // 포트폴리오 데이터 기반 상세 카드 렌더링
         var detailCards = portfolioData.map(function (item, idx) {
             var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
             var techList = (lang === 'ko' ? item.techStack.ko : item.techStack.en);
             var featList = (lang === 'ko' ? item.features.ko : item.features.en);
             var arch = lang === 'ko' ? item.architecture.ko : item.architecture.en;
+            var liveLinkHtml = item.liveUrl
+                ? (
+                    '<a href="' + item.liveUrl + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-white transition-colors">' +
+                    '<i class="fa-solid fa-up-right-from-square text-xs"></i>' +
+                    (lang === 'ko' ? '사이트 방문' : 'Visit Site') +
+                    '</a>'
+                )
+                : '';
 
-            // 기술 ?�택 ?�그 HTML
+            // 기술 스택 태그 HTML
             var techHtml = techList.map(function (t) {
                 return '<span class="text-xs font-mono bg-accent/10 text-accent px-2.5 py-1 rounded-lg border border-accent/20">' + t + '</span>';
             }).join('');
 
-            // 주요 기능 리스??HTML
+            // 주요 기능 리스트 HTML
             var featHtml = featList.map(function (f) {
                 return '<li class="flex gap-2 items-start">' +
                     '<i class="fa-solid fa-bolt text-neon-orange text-xs mt-1 shrink-0"></i>' +
@@ -512,51 +710,88 @@
                     '</li>';
             }).join('');
 
-            // ?�그 ?�벨 HTML
+            // 태그 라벨 HTML
             var tagsHtml = item.tags.map(function (tg) {
                 return '<span class="text-xs font-bold text-white bg-white/10 px-3 py-1 rounded-full">' + tg + '</span>';
             }).join('');
 
-            // ?��?지�??�쪽/?�른�?교차 배치 (짝수: ?��?지 ?�쪽, ?�?? ?��?지 ?�른�?
+            // 이미지 좌/우 교차 배치 (짝수: 이미지 왼쪽, 홀수: 이미지 오른쪽)
             var isEven = idx % 2 === 0;
+            var mainImage = getPortfolioThumb(item);
 
             var imageBlock =
                 '<div class="w-full lg:w-2/5 shrink-0">' +
                 '<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-lg">' +
-                '<img src="' + item.img + '" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="' + item.title + '">' +
+                '<img src="' + mainImage + '" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="' + item.title + '">' +
                 '</div>' +
                 '<div class="flex gap-2 mt-3 flex-wrap">' + tagsHtml + '</div>' +
                 '<p class="text-white/40 text-xs mt-2"><i class="fa-solid fa-display mr-1"></i>' + item.platform + '</p>' +
                 '</div>';
+
+            var galleryHtml = '';
+            if (Array.isArray(item.gallery) && item.gallery.length) {
+                var galleryTitle = lang === 'ko' ? 'AI 이미지 갤러리' : 'AI Image Gallery';
+                var imageCount = item.gallery.reduce(function (count, section) {
+                    return count + (Array.isArray(section.images) ? section.images.length : 0);
+                }, 0);
+
+                var categorySections = item.gallery.map(function (section) {
+                    var sectionImages = Array.isArray(section.images) ? section.images : [];
+                    var sectionThumbs = sectionImages.map(function (src) {
+                        return '<a href="' + src + '" target="_blank" rel="noopener noreferrer" class="group block rounded-xl overflow-hidden border border-white/10 hover:border-accent/70 transition-colors bg-black/20">' +
+                            '<img src="' + src + '" alt="' + section.category + '" class="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300">' +
+                            '</a>';
+                    }).join('');
+
+                    return '<div class="space-y-3">' +
+                        '<div class="flex items-center justify-between">' +
+                        '<h4 class="text-sm font-bold text-white">' + section.category + '</h4>' +
+                        '<span class="text-xs text-white/50">' + sectionImages.length + ' imgs</span>' +
+                        '</div>' +
+                        '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">' + sectionThumbs + '</div>' +
+                        '</div>';
+                }).join('');
+
+                galleryHtml =
+                    '<div class="glass-card rounded-2xl p-5 border border-white/10 space-y-5">' +
+                    '<div class="flex items-end justify-between gap-4">' +
+                    '<h3 class="text-sm font-bold text-accent uppercase tracking-wider"><i class="fa-solid fa-images mr-1.5"></i>' + galleryTitle + '</h3>' +
+                    '<span class="text-xs text-white/50">' + imageCount + ' images</span>' +
+                    '</div>' +
+                    categorySections +
+                    '</div>';
+            }
 
             var infoBlock =
                 '<div class="flex-1 space-y-5">' +
                 '<div>' +
                 '<h2 class="text-2xl md:text-3xl font-bold text-white mb-2">' + item.title + '</h2>' +
                 '<p class="text-white/70 text-base leading-relaxed">' + desc + '</p>' +
+                (liveLinkHtml ? '<div class="mt-3">' + liveLinkHtml + '</div>' : '') +
                 '</div>' +
 
-                // 주요 기능 ?�션
+                // 주요 기능 섹션
                 '<div>' +
                 '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-star mr-1.5"></i>' + (lang === 'ko' ? '주요 기능' : 'Key Features') + '</h3>' +
                 '<ul class="space-y-2">' + featHtml + '</ul>' +
                 '</div>' +
 
-                // ?�키?�처 ?�징 ?�션
+                // 아키텍처 요약 섹션
                 '<div class="glass-button rounded-xl p-4 border border-white/10">' +
-                '<h3 class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-1.5"><i class="fa-solid fa-cubes mr-1.5"></i>' + (lang === 'ko' ? '?�키?�처' : 'Architecture') + '</h3>' +
+                '<h3 class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-1.5"><i class="fa-solid fa-cubes mr-1.5"></i>' + (lang === 'ko' ? '아키텍처' : 'Architecture') + '</h3>' +
                 '<p class="text-white/60 text-sm">' + arch + '</p>' +
                 '</div>' +
 
-                // 기술 ?�택 ?�션
+                // 기술 스택 섹션
                 '<div>' +
-                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-code mr-1.5"></i>' + (lang === 'ko' ? '기술 ?�택' : 'Tech Stack') + '</h3>' +
+                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-code mr-1.5"></i>' + (lang === 'ko' ? '기술 스택' : 'Tech Stack') + '</h3>' +
                 '<div class="flex flex-wrap gap-2">' + techHtml + '</div>' +
                 '</div>' +
+                galleryHtml +
 
                 '</div>';
 
-            // ?�이?�웃: 짝수/?�??교차
+            // 레이아웃: 짝수/홀수 교차
             var innerHtml = isEven
                 ? imageBlock + infoBlock
                 : infoBlock + imageBlock;
@@ -570,22 +805,27 @@
             );
         }).join('');
 
+        /* 3D 배경(z-index:0) 위에 콘텐츠가 항상 보이도록 래퍼에 z-20 적용 */
         portfolioRoot.innerHTML =
+            '<div class="relative z-20 w-full">' +
             nav +
             '<main class="pt-24 pb-20 px-6 max-w-6xl mx-auto space-y-10">' +
-            '<h1 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center tracking-tight">Portfolio</h1>' +
-            '<p class="text-white/50 text-center text-lg mb-8">' + (lang === 'ko' ? '직접 기획?�고 개발???�로?�트?�입?�다.' : 'Projects I planned and built myself.') + '</p>' +
+            '<h1 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center tracking-tight">' +
+            (lang === 'ko' ? '포트폴리오' : 'Portfolio') +
+            '</h1>' +
+            '<p class="text-white/50 text-center text-lg mb-8">' + (lang === 'ko' ? '직접 기획하고 개발한 프로젝트입니다.' : 'Projects I planned and built myself.') + '</p>' +
             detailCards +
             '</main>' +
-            '<div class="text-center text-white/40 text-xs pb-8">' + t('footer_note') + '</div>';
+            '<div class="text-center text-white/40 text-xs pb-8">' + t('footer_note') + '</div>' +
+            '</div>';
 
-        // ?�어 ?�환 버튼 ?�벤??바인??
+        // 언어 전환 버튼 이벤트 바인딩
         var btnKo = $('#btn-ko', portfolioRoot);
         var btnEn = $('#btn-en', portfolioRoot);
         if (btnKo) btnKo.addEventListener('click', function () { setLang('ko'); });
         if (btnEn) btnEn.addEventListener('click', function () { setLang('en'); });
 
-        // ?�크�????�이?�인 ?�니메이???�용
+        // 스크롤 인 애니메이션 적용
         var obs = new IntersectionObserver(function (entries) {
             entries.forEach(function (e) {
                 if (e.isIntersecting) e.target.classList.add('show');
@@ -594,9 +834,10 @@
         $$('.ai-fade', portfolioRoot).forEach(function (el) { obs.observe(el); });
 
         initGalaxyCursor();
-        initSplineBackground();
+        // 포트폴리오 페이지에서도 메인 랜딩과 동일한 Spline 3D 배경 사용
+        initSplineBackground({ forceRefresh: true, reason: 'portfolio-render' });
 
-        // [?�규 추�?] ?�이지 ?�적 로딩 ???�커 ?�치�??�동 ?�크�?
+        // 페이지 동적 로딩 시 해시 앵커 자동 스크롤
         if (window.location.hash) {
             setTimeout(function () {
                 var targetId = window.location.hash.substring(1);
@@ -608,26 +849,75 @@
         }
     }
 
-    // --- Spline 3D 배경 초기??(?�공??링크�?Iframe?�로 ?�용) ---
+    // --- Spline 3D 배경 초기화 (공식 링크를 iframe으로 사용) ---
+    function removeSparkBackground() {
+        var spark = document.getElementById('spark-bg');
+        if (spark) spark.remove();
+    }
+
+    function initSparkBackground() {
+        var existing = document.getElementById('spark-bg');
+        if (existing) return;
+
+        var spline = document.getElementById('spline-wrapper');
+        if (spline) spline.remove();
+
+        var spark = document.createElement('div');
+        spark.id = 'spark-bg';
+        spark.className = 'spark-bg';
+
+        var layer = document.createElement('div');
+        layer.className = 'spark-layer';
+        spark.appendChild(layer);
+
+        for (var i = 0; i < 44; i++) {
+            var dot = document.createElement('span');
+            dot.className = 'spark-dot';
+            dot.style.left = (Math.random() * 100).toFixed(2) + '%';
+            dot.style.top = (Math.random() * 100).toFixed(2) + '%';
+            dot.style.animationDelay = (Math.random() * 2.8).toFixed(2) + 's, ' + (Math.random() * 1.5).toFixed(2) + 's';
+            dot.style.animationDuration = (5 + Math.random() * 5).toFixed(2) + 's, ' + (1.8 + Math.random() * 1.5).toFixed(2) + 's';
+            spark.appendChild(dot);
+        }
+
+        document.body.prepend(spark);
+    }
+
     function buildSplineSrc(forceRefresh) {
-        if (forceRefresh) return SPLINE_SCENE_URL + '?r=' + Date.now();
-        return SPLINE_SCENE_URL;
+        var base = SPLINE_SCENE_URL;
+        var sep = base.indexOf('?') === -1 ? '?' : '&';
+        var nonce = forceRefresh ? Date.now() : Math.floor(Date.now() / 5000);
+        return base + sep + 'cb=' + nonce;
     }
 
     function showSplineWrapper(sw, isFallback) {
         if (!sw) return;
         sw.style.opacity = '1';
         if (isFallback) {
-            console.warn('?�️ Spline load delayed - showing wrapper anyway');
+            console.warn('Spline load delayed - showing wrapper anyway');
         }
     }
 
     function bindSplineIframeLoad(ifr, sw) {
         ifr.onload = function () {
+            // #region agent log
+            debugLog('H6', 'js/app_v2.js:bindSplineIframeLoad', 'iframe onload', {
+                iframeSrc: ifr ? ifr.src : null,
+                wrapperOpacity: sw ? sw.style.opacity : null
+            });
+            // #endregion
             setTimeout(function () {
                 showSplineWrapper(sw, false);
-                console.log('??Spline iframe loaded');
+                console.log('Spline iframe loaded');
+                logSplineDomState('after-onload-show');
             }, 350);
+        };
+        ifr.onerror = function () {
+            // #region agent log
+            debugLog('H6', 'js/app_v2.js:bindSplineIframeLoad', 'iframe onerror', {
+                iframeSrc: ifr ? ifr.src : null
+            });
+            // #endregion
         };
 
         setTimeout(function () {
@@ -649,7 +939,32 @@
         sw.style.opacity = '0';
         bindSplineIframeLoad(ifr, sw);
         ifr.src = buildSplineSrc(true);
-        console.log('?�� Spline refreshed:', reason || 'manual');
+        console.log('Spline refreshed:', reason || 'manual');
+        logSplineDomState('after-refresh-src-set');
+    }
+
+    /** Single orchestrator: all recovery triggers go through here. Dedupes by time window and same-reason. */
+    function requestSplineRecovery(reason) {
+        var now = Date.now();
+        var r = reason || 'recover';
+        if (splineLastRecoveryAt && (now - splineLastRecoveryAt) < SPLINE_RECOVERY_DEBOUNCE_MS) return;
+        if (splineLastRecoveryReason === r && splineLastRecoveryAt && (now - splineLastRecoveryAt) < 2000) return;
+        splineLastRecoveryAt = now;
+        splineLastRecoveryReason = r;
+        splineRecoveryToken = now;
+        // #region agent log
+        debugLog('H2', 'js/app_v2.js:requestSplineRecovery', 'recovery accepted', {
+            reason: r,
+            now: now,
+            lastRefreshAt: splineLastRefreshAt,
+            visibilityState: document.visibilityState
+        });
+        // #endregion
+        refreshSplineBackground(r);
+    }
+
+    function triggerSplineRecovery(reason) {
+        requestSplineRecovery(reason || 'recover');
     }
 
     function bindSplineLifecycleEvents() {
@@ -657,25 +972,52 @@
         splineLifecycleBound = true;
 
         window.addEventListener('pageshow', function (evt) {
-            // BFCache restore can freeze WebGL inside iframe.
-            if (evt.persisted) {
-                setTimeout(function () {
-                    refreshSplineBackground('pageshow-bfcache');
-                }, 120);
-            }
+            // #region agent log
+            debugLog('H1', 'js/app_v2.js:pageshow', 'pageshow event', {
+                persisted: !!evt.persisted,
+                visibilityState: document.visibilityState,
+                initializedAgoMs: Date.now() - splineInitializedAt
+            });
+            // #endregion
+            // Normal full navigation recreates iframe, so recovery is needed only on BFCache restore.
+            if (evt.persisted) triggerSplineRecovery('pageshow-bfcache');
+        });
+
+        document.addEventListener('resume', function () {
+            // #region agent log
+            debugLog('H3', 'js/app_v2.js:resume', 'resume event', {
+                visibilityState: document.visibilityState
+            });
+            // #endregion
+            triggerSplineRecovery('document-resume');
+        });
+
+        window.addEventListener('focus', function () {
+            // #region agent log
+            debugLog('H3', 'js/app_v2.js:focus', 'focus event', {
+                visibilityState: document.visibilityState,
+                sinceHiddenMs: Date.now() - splineLastHiddenAt
+            });
+            // #endregion
+            // Focus events are noisy; avoid forcing refresh from focus alone.
         });
 
         document.addEventListener('visibilitychange', function () {
+            // #region agent log
+            debugLog('H3', 'js/app_v2.js:visibilitychange', 'visibilitychange event', {
+                visibilityState: document.visibilityState,
+                sinceHiddenMs: Date.now() - splineLastHiddenAt
+            });
+            // #endregion
             if (document.visibilityState === 'hidden') {
                 splineLastHiddenAt = Date.now();
                 return;
             }
 
-            if (Date.now() - splineLastHiddenAt > 800) {
-                setTimeout(function () {
-                    refreshSplineBackground('visibility-visible');
-                }, 120);
-            }
+            var hiddenMs = Date.now() - splineLastHiddenAt;
+            var initAgeMs = Date.now() - splineInitializedAt;
+            if (!splineLastHiddenAt || hiddenMs < 300 || initAgeMs < 1500) return;
+            triggerSplineRecovery(hiddenMs > 800 ? 'visibility-visible' : 'visibility-quick-return');
         });
     }
 
@@ -684,20 +1026,35 @@
         var forceRefresh = !!opts.forceRefresh;
         var sw = document.getElementById('spline-wrapper');
         var ifr = document.getElementById('spline-bg');
+        removeSparkBackground();
+        // #region agent log
+        debugLog('H4', 'js/app_v2.js:initSplineBackground', 'init spline background', {
+            href: window.location.href,
+            forceRefresh: forceRefresh,
+            hasRoot: !!root,
+            hasPortfolioRoot: !!portfolioRoot,
+            hasWrapper: !!sw,
+            hasIframe: !!ifr
+        });
+        // #endregion
 
         bindSplineLifecycleEvents();
 
         if (sw && ifr) {
+            if (!splineInitializedAt) splineInitializedAt = Date.now();
             if (forceRefresh) refreshSplineBackground(opts.reason || 'force');
             return;
         }
 
         if (sw && !ifr) sw.remove();
 
-        console.log('?�� Initializing Spline background...');
+        console.log('Initializing Spline background...');
         sw = document.createElement('div');
         sw.id = 'spline-wrapper';
-        sw.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; background:#0b1220; opacity:0; transition: opacity 1.2s ease-in-out;";
+        // z-index:0 + pointer-events:auto so Spline iframe receives mousemove (robot follow).
+        // Content layer is z-20 with pointer-events-none; only cards/buttons have pointer-events-auto, so events pass through to Spline in empty areas.
+        sw.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:auto; background:#0f172a; opacity:0; transition: opacity 1.2s ease-in-out;";
+        splineInitializedAt = Date.now();
 
         ifr = document.createElement('iframe');
         ifr.id = 'spline-bg';
@@ -707,6 +1064,11 @@
         ifr.style.width = '100%';
         ifr.style.height = '100%';
         ifr.style.display = 'block';
+        // #region agent log
+        debugLog('H13', 'js/app_v2.js:initSplineBackground', 'initial iframe src with cache-bust', {
+            iframeSrc: ifr.src
+        });
+        // #endregion
 
         sw.appendChild(ifr);
         document.body.prepend(sw);
@@ -719,7 +1081,7 @@
             return;
         }
 
-        console.log('?�� Rendering glassmorphic design...');
+        console.log('Rendering glassmorphic design...');
 
         var expData = [
             ['exp1_t', 'exp1_d', 'fa-laptop-code'],
@@ -734,7 +1096,7 @@
 
         var expItems = expData.map(function (item) {
             return (
-                '<div class="ai-item glass-card rounded-2xl p-6 flex gap-5 pointer-events-auto group">' +
+                '<div class="ai-item glass-card rounded-2xl p-6 flex gap-5 group">' +
                 '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-cyan-400/10 border border-accent/30 flex items-center justify-center shrink-0 shadow-lg group-hover:from-accent/30 group-hover:to-cyan-400/20 transition-all">' +
                 '<i class="fa-solid ' + item[2] + ' text-xl text-accent group-hover:text-white transition-colors"></i>' +
                 '</div>' +
@@ -767,6 +1129,14 @@
             '<button id="btn-en" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold transition-all ' + (lang === 'en' ? 'bg-accent/30 text-white border-accent/60 shadow-lg shadow-accent/30' : 'text-white/70 hover:text-white hover:bg-white/10') + '">EN</button>' +
             '</div>';
 
+        var carouselBaseItems = portfolioData.slice();
+        var aiCardIndex = carouselBaseItems.findIndex(function (item) { return item.id === 'p5'; });
+        if (aiCardIndex !== -1) {
+            var aiCard = carouselBaseItems.splice(aiCardIndex, 1)[0];
+            carouselBaseItems.splice(Math.min(2, carouselBaseItems.length), 0, aiCard);
+        }
+        var carouselItems = [].concat(carouselBaseItems, carouselBaseItems, carouselBaseItems);
+
         // setTimeout(initSplineViewer, 100); // Using Iframe for external Spline URL
 
         root.innerHTML = [
@@ -777,10 +1147,10 @@
 
             // HERO SECTION - Large Glass Panel
             '<section class="relative py-10">',
-            '<div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch px-6">',
+            '<div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch px-6 pointer-events-none">',
 
             // Profile Card - Left Side Glass Panel
-            '<aside class="md:col-span-4 pointer-events-auto glass-panel glass-glow rounded-3xl p-6 transform hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">',
+            '<aside class="md:col-span-4 glass-panel glass-glow rounded-3xl p-6 transform hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">',
             '<div class="rounded-2xl overflow-hidden border border-white/20 mb-4 flex-shrink-0">',
             '<img src="' + CONFIG.assetsBase + '/img/profile.jpg" alt="profile" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">',
             '</div>',
@@ -795,7 +1165,7 @@
             '</aside>',
 
             // Main Hero Content - Right Side Glass Panel
-            '<div class="md:col-span-8 pointer-events-auto glass-panel glass-glow rounded-3xl p-8 md:p-12 flex flex-col justify-center h-full text-center break-keep">',
+            '<div class="md:col-span-8 glass-panel glass-glow rounded-3xl p-8 md:p-12 flex flex-col justify-center h-full text-center break-keep">',
             '<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-button text-white text-base mb-6 mx-auto">',
             '<span class="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_rgba(79,209,255,0.8)]"></span>',
             t('hero_kicker'),
@@ -820,8 +1190,8 @@
             '</section>',
 
             // Portfolio Carousel (New Section)
-            '<section class="relative py-10 overflow-hidden">',
-            '<div class="max-w-[1120px] mx-auto px-6 pointer-events-auto ai-fade">',
+            '<section id="carousel-section" class="relative py-10 overflow-hidden">',
+            '<div class="max-w-[1120px] mx-auto px-6 ai-fade">',
             '<div class="flex justify-between items-end mb-6">',
             '<h2 class="text-3xl font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Portfolio</h2>',
             '<a href="portfolio.html" class="text-sm text-accent hover:text-white transition-colors flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></a>',
@@ -831,12 +1201,14 @@
             '<div class="w-full overflow-hidden mask-linear-fade">',
             '<div class="flex gap-6 animate-marquee">',
             // Duplicate data 3 times for smooth infinite loop on wide screens
-            [...portfolioData, ...portfolioData, ...portfolioData].map(function (item) {
+            carouselItems.map(function (item, idx) {
                 var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+                var thumb = getPortfolioThumb(item);
+                var imgAttrs = item.id === 'p5' ? ' data-ai-rotate="true"' : '';
                 return (
                     '<div class="shrink-0 w-[280px] md:w-[320px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-accent/50 transition-colors" onclick="location.href=\'portfolio.html#' + item.id + '\'">' +
                     '<div class="h-40 bg-black/50 relative overflow-hidden">' +
-                    '<img src="' + item.img + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">' +
+                    '<img src="' + thumb + '"' + imgAttrs + ' class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">' +
                     '</div>' +
                     '<div class="p-4">' +
                     '<h3 class="text-lg font-bold text-white mb-1 truncate">' + item.title + '</h3>' +
@@ -903,7 +1275,7 @@
             '<h2 class="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent">' + t('contact_h2') + '</h2>',
             '<p class="text-white/80 text-lg leading-relaxed mb-8">' + t('contact_lead') + '</p>',
 
-            // ??카드 - ?�쪽 ?�렬 (mx-auto ?�거)
+            // 카드 좌측 정렬 (mx-auto 제거)
             '<div class="glass-card rounded-2xl p-8 max-w-2xl border border-white/10 shadow-2xl relative overflow-hidden group/form">',
             '<div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover/form:opacity-100 transition-opacity duration-500 pointer-events-none"></div>',
 
@@ -954,6 +1326,7 @@
 
 
         initSplineBackground();
+        initAICarouselRotation(root);
 
         var btnKo = $('#btn-ko', root);
         var btnEn = $('#btn-en', root);
@@ -1030,7 +1403,7 @@
                         // Show Success Message
                         var successMsg = document.createElement('p');
                         successMsg.className = 'status-msg text-green-400 text-center mt-4 font-bold animate-pulse';
-                        successMsg.textContent = lang === 'ko' ? '문의가 ?�공?�으�??�송?�었?�니??' : 'Your inquiry was sent successfully.';
+                        successMsg.textContent = lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.';
                         container.appendChild(successMsg);
 
                         setTimeout(() => { if (successMsg) successMsg.remove(); }, 5000);
@@ -1045,7 +1418,7 @@
 
                         var errorMsg = document.createElement('p');
                         errorMsg.className = 'status-msg text-red-400 text-center mt-4 font-bold';
-                        errorMsg.textContent = lang === 'ko' ? '?�송 ?�패. ?�메?�로 직접 문의?�주?�요.' : 'Failed to send. Please email directly.';
+                        errorMsg.textContent = lang === 'ko' ? '전송 실패. 이메일로 직접 문의해주세요.' : 'Failed to send. Please email directly.';
                         container.appendChild(errorMsg);
                     });
             });
@@ -1055,10 +1428,10 @@
         bindMotion();
         initGalaxyCursor();
 
-        console.log('??Glassmorphic Landing Page Loaded');
+        console.log('Glassmorphic Landing Page Loaded');
     }
 
-    console.log('?? Initializing...');
+    console.log('Initializing...');
     loadDict(lang)
         .then(function (loaded) {
             if (!loaded) dict = {};
@@ -1068,7 +1441,7 @@
                 render();
             } catch (e) {
                 console.error('ERROR:', e);
-                alert('?�류: ' + e.message);
+                alert('오류: ' + e.message);
             }
         });
 })();
