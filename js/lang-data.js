@@ -53,7 +53,7 @@ window.AI_LANG_DATA = {
         "contact_phone_label": "연락처",
         "contact_message_label": "내용",
         "contact_submit_btn": "문의 사항 보내기",
-        "footer_note": "© AI Application Creator · mrsure.kr/ai"
+        "footer_note": "© 2026 Mr.Sure. All Rights Reserved."
     },
     en: {
         "nav_about": "About",
@@ -110,6 +110,6 @@ window.AI_LANG_DATA = {
         "contact_phone_label": "Contact Info",
         "contact_message_label": "Message",
         "contact_submit_btn": "Send Inquiry",
-        "footer_note": "© AI Application Creator · mrsure.kr/ai"
+        "footer_note": "© 2026 Mr.Sure. All Rights Reserved."
     }
 };
