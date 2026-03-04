@@ -911,7 +911,8 @@
 
                 // Distance to mouse for "Flashlight" reveal effect
                 float distToMouse = length(uv - m);
-                float mouseReveal = smoothstep(0.45, 0.1, distToMouse);
+                // Widen the reveal transition for a smoother, blurrier edge
+                float mouseReveal = smoothstep(0.6, 0.1, distToMouse);
                 
                 // Individual cube "height" or intensity modulation
                 float h = hash(id);
@@ -933,17 +934,17 @@
                 // Apply the mouse reveal (flashlight) mask
                 color *= mouseReveal;
 
-                // Subtle ambient glow at the cursor position
-                color += baseRGB * smoothstep(0.18, 0.0, distToMouse) * 0.45;
+                // Soften ambient glow for less eye strain
+                color += baseRGB * smoothstep(0.25, 0.0, distToMouse) * 0.25;
 
                 // Deep Space Background Color (Midnight Blue / Deep Purple)
                 vec3 spaceColor = mix(vec3(0.01, 0.015, 0.04), vec3(0.02, 0.01, 0.035), uv.y * 0.5 + 0.5);
                 
                 // Background fade - blend the grid/glow with the space color
-                color = mix(spaceColor, color, mouseReveal + 0.1);
+                color = mix(spaceColor, color, mouseReveal * 0.8);
 
-                // Final brightness adjustment for text readability
-                color *= 0.7;
+                // Reduce overall brightness for text contrast (0.7 -> 0.45)
+                color *= 0.45;
 
                 gl_FragColor = vec4(color, 1.0);
             }
