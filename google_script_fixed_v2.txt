@@ -1,0 +1,87 @@
+/**
+ * [중요] GAS 에디터에서 '실행' 버튼을 직접 누르면 'parameter'가 없어 오류가 발생합니다.
+ * 실제 테스트를 위해 아래 'testDoPost' 함수를 실행하거나, 웹사이트에서 직접 전송해보세요.
+ */
+function testDoPost() {
+  var dummyEvent = {
+    parameter: {
+      name: "테스트",
+      phone: "010-0000-0000",
+      subject: "테스트 제목",
+      message: "테스트 메시지 내용입니다."
+    }
+  };
+  doPost(dummyEvent);
+}
+
+function doPost(e) {
+  // e가 없을 경우(에디터 직접 실행 시) 오류 방지
+  if (!e || !e.parameter) {
+    console.error("이 함수는 웹사이트의 요청(e)이 있어야 작동합니다. 에디터에서 테스트하려면 testDoPost를 실행하세요.");
+    return ContentService.createTextOutput("error: No parameters found. Please test via website or testDoPost function.");
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var p = e.parameter;
+    
+    // 1. 구글 시트에 데이터 저장
+    sheet.appendRow([
+      new Date(),
+      p.subject,
+      p.name,
+      p.phone,
+      p.message
+    ]);
+
+    // 2. 텔레그램 알림 발송
+    sendTelegramNotification(p.name, p.phone, p.subject, p.message);
+
+    return ContentService.createTextOutput("success");
+    
+  } catch (err) {
+    console.error("Error: " + err.toString());
+    return ContentService.createTextOutput("error: " + err.toString());
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 텔레그램 자동 발송 함수
+function sendTelegramNotification(name, phone, subject, message) {
+  var botToken = "8582233732:AAGXFko90iJzCubO9KZYrvGdgu6M3O_ca4k"; 
+  var chatId = "여기에_본인의_숫자_ID를_입력하세요"; // 예: 123456789
+  
+  if (chatId === "여기에_본인의_숫자_ID를_입력하세요") {
+    console.warn("Chat ID가 설정되지 않아 텔레그램 발송을 건너뜁니다.");
+    return;
+  }
+
+  var text = "🚀 [새 문의사항 알림]\n\n" +
+             "👤 이름: " + name + "\n" +
+             "📞 연락처: " + phone + "\n" +
+             "📌 제목: " + subject + "\n" +
+             "📝 내용: " + message;
+             
+  var url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+  var payload = {
+    "chat_id": chatId,
+    "text": text
+  };
+  
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true
+  };
+  
+  try {
+    UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    console.error("Telegram Error: " + e.toString());
+  }
+}

@@ -1,0 +1,738 @@
+﻿diff --git a/js/app_v2.js b/js/app_v2.js
+index 61b4cf7..1758a72 100644
+--- a/js/app_v2.js
++++ b/js/app_v2.js
+@@ -132,54 +132,200 @@
+           z-index: 9998;
+           animation: particleFade 1.5s forwards ease-out;
+           box-shadow: 0 0 6px currentColor;
+-      }
+-      @keyframes particleFade {
+-          0% { opacity: 1; transform: scale(1); }
+-          100% { opacity: 0; transform: scale(0.2) translateY(10px); }
+-      }
++(function () {
++    'use strict';
++
++    document.documentElement.classList.add('js');
++
++    // Enhanced CSS for comprehensive glassmorphic design
++    var dynamicStyle = document.createElement('style');
++    dynamicStyle.innerHTML = `
++        /* Core Glassmorphism Styles */
++        .glass - panel {
++        background: rgba(255, 255, 255, 0.01);
++        backdrop - filter: blur(4px);
++        -webkit - backdrop - filter: blur(4px);
++        border: 1px solid rgba(255, 255, 255, 0.08);
++        box - shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.15);
++        position: relative;
++    }
+       
+-      .ai-fade {
+-          opacity: 0;
+-          transform: translateY(30px);
+-          transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), 
+-                      transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+-      }
+-      .ai-fade.show {
+-          opacity: 1;
+-          transform: translateY(0);
+-      }
++      .glass - panel::before {
++        content: '';
++        position: absolute;
++        inset: 0;
++        border - radius: inherit;
++        padding: 1.5px;
++        background: linear - gradient(135deg,
++            rgba(255, 255, 255, 0.4) 0 %,
++            rgba(79, 209, 255, 0.3) 25 %,
++            transparent 50 %,
++            rgba(255, 122, 24, 0.2) 75 %,
++            rgba(255, 255, 255, 0.3) 100 %);
++        -webkit - mask: linear - gradient(#fff 0 0) content - box, linear - gradient(#fff 0 0);
++        -webkit - mask - composite: xor;
++        mask - composite: exclude;
++        opacity: 0.25;
++        pointer - events: none;
++    }
++      
++      .glass - glow {
++        filter: drop - shadow(0 0 20px rgba(79, 209, 255, 0.3))
++        drop - shadow(0 8px 16px rgba(0, 0, 0, 0.3));
++    }
++      
++      .glass - button {
++        background: rgba(255, 255, 255, 0.12);
++        backdrop - filter: blur(12px);
++        border: 1px solid rgba(255, 255, 255, 0.25);
++        box - shadow: 0 4px 16px rgba(79, 209, 255, 0.4),
++            inset 0 1px 0 rgba(255, 255, 255, 0.2),
++                inset 0 - 1px 0 rgba(0, 0, 0, 0.2);
++        transition: all 0.3s cubic - bezier(0.4, 0, 0.2, 1);
++        position: relative;
++        overflow: hidden;
++    }
++      
++      .glass - button::after {
++        content: '';
++        position: absolute;
++        top: 50 %;
++        left: 50 %;
++        width: 0;
++        height: 0;
++        border - radius: 50 %;
++        background: rgba(255, 255, 255, 0.2);
++        transform: translate(-50 %, -50 %);
++        transition: width 0.6s, height 0.6s;
++    }
++      
++      .glass - button:hover {
++        background: rgba(255, 255, 255, 0.18);
++        border - color: rgba(79, 209, 255, 0.6);
++        box - shadow: 0 8px 24px rgba(79, 209, 255, 0.6),
++            inset 0 1px 0 rgba(255, 255, 255, 0.3);
++        transform: translateY(-2px);
++    }
++      
++      .glass - button: hover::after {
++        width: 300px;
++        height: 300px;
++    }
++      
++      .glass - card {
++        background: rgba(255, 255, 255, 0.06);
++        backdrop - filter: blur(16px);
++        border: 1px solid rgba(255, 255, 255, 0.15);
++        box - shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
++            inset 0 0 20px rgba(255, 255, 255, 0.03);
++        transition: all 0.3s ease;
++    }
++      
++      .glass - card:hover {
++        background: rgba(255, 255, 255, 0.1);
++        border - color: rgba(79, 209, 255, 0.4);
++        box - shadow: 0 8px 24px rgba(79, 209, 255, 0.3),
++            inset 0 0 30px rgba(255, 255, 255, 0.05);
++        transform: translateY(-4px);
++    }
++
++      .ai - item {
++        transition: transform 0.3s cubic - bezier(0.34, 1.56, 0.64, 1),
++            box - shadow 0.3s ease,
++                border - color 0.3s ease,
++                    background - color 0.3s ease;
++    }
+       
+-      @keyframes cascadeIn {
++      .ai - item:hover {
++        transform: scale(1.02) translateY(-4px)!important;
++        z - index: 50!important;
++        box - shadow: 0 0 25px rgba(255, 122, 24, 0.6),
++            0 20px 40px rgba(0, 0, 0, 0.4)!important;
++        border - color: rgba(255, 122, 24, 0.8)!important;
++        background - color: rgba(255, 255, 255, 0.12)!important;
++    }
++
++    /* Galaxy Cursor */
++    body, a, button, input, textarea, .ai - item { cursor: none!important; }
++      .ai - cursor - head {
++        position: fixed; top: 0; left: 0;
++        width: 20px; height: 20px;
++        background: radial - gradient(circle, rgba(255, 255, 255, 1) 0 %, rgba(79, 209, 255, 0.9) 30 %, rgba(79, 209, 255, 0) 70 %);
++        border - radius: 50 %;
++        transform: translate(-50 %, -50 %);
++        pointer - events: none;
++        z - index: 9999;
++        mix - blend - mode: screen;
++        box - shadow: 0 0 16px rgba(79, 209, 255, 0.6);
++        transition: transform 0.1s ease - out;
++    }
++      .ai - star - particle {
++        position: fixed;
++        border - radius: 50 %;
++        pointer - events: none;
++        z - index: 9998;
++        animation: particleFade 1.5s forwards ease - out;
++        box - shadow: 0 0 6px currentColor;
++    }
++    @keyframes particleFade {
++        0 % { opacity: 1; transform: scale(1); }
++        100 % { opacity: 0; transform: scale(0.2) translateY(10px); }
++    }
++      
++      .ai - fade {
++        opacity: 0;
++        transform: translateY(30px);
++        transition: opacity 1s cubic - bezier(0.2, 0.8, 0.2, 1),
++            transform 1s cubic - bezier(0.2, 0.8, 0.2, 1);
++    }
++      .ai - fade.show {
++        opacity: 1;
++        transform: translateY(0);
++    }
++
++    @keyframes cycleFade {
++        0 % { opacity: 1; }
++        20 % { opacity: 1; }
++        33 % { opacity: 0; }
++        87 % { opacity: 0; }
++        100 % { opacity: 1; }
++    }
++      .ai - fade.show {
++        opacity: 1;
++        transform: translateY(0);
++    }
++
++    @keyframes cascadeIn {
+           from {
+-              opacity: 0;
+-              transform: translateY(20px);
+-              filter: blur(4px);
+-          }
++            opacity: 0;
++            transform: translateY(20px);
++            filter: blur(4px);
++        }
+           to {
+-              opacity: 1;
+-              transform: translateY(0);
+-              filter: blur(0);
+-          }
+-      }
+-      .cascade-show {
+-          animation: cascadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+-          animation-delay: var(--d, 0ms);
+-          opacity: 0;
+-      }
+-      
+-      /* Marquee Animation */
+-      @keyframes marquee {
+-          0% { transform: translateX(0); }
+-          100% { transform: translateX(-33.333333%); }
+-      }
+-      .animate-marquee {
+-          animation: marquee 30s linear infinite;
+-          width: max-content;
+-      }
+-      .animate-marquee:hover {
+-          animation-play-state: paused;
+-      }
+-  `;
++            opacity: 1;
++            transform: translateY(0);
++            filter: blur(0);
++        }
++    }
++      .cascade - show {
++        animation: cascadeIn 0.8s cubic - bezier(0.2, 0.8, 0.2, 1) forwards;
++        animation - delay: var(--d, 0ms);
++        opacity: 0;
++    }
++
++    /* Marquee Animation */
++    @keyframes marquee {
++        0 % { transform: translateX(0); }
++        100 % { transform: translateX(-33.333333 %); }
++    }
++      .animate - marquee {
++        animation: marquee 30s linear infinite;
++        width: max - content;
++    }
++      .animate - marquee:hover {
++        animation - play - state: paused;
++    }
++    `;
+     document.head.appendChild(dynamicStyle);
+ 
+     if (!document.querySelector('script[src*="lang-data.js"]')) {
+@@ -222,7 +368,7 @@
+     function $(sel, el) { return (el || document).querySelector(sel); }
+     function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
+ 
+-    // --- ?占쏀듃?占쎈━???占쎌씠??(?占쎌젣 ?占쎈줈?占쏀듃 湲곕컲 ?占쎌꽭 ?占쎈낫 ?占쏀븿) ---
++    // --- ???由??????(????濡???湲곕컲 ????蹂???? ---
+     var portfolioData = [
+         {
+             id: 'p1',
+@@ -328,6 +474,79 @@
+                 en: 'Server + Client Components hybrid with Supabase and Python scraping pipeline'
+             },
+             platform: 'Web (Responsive)'
++        },
++        {
++            id: 'p4',
++            title: 'IT News Hub',
++            desc: {
++                ko: '留ㅼ씪 援?궡??理쒖떊 IT, AI ?댁뒪瑜?紐⑥븘 蹂????덈뒗 ?먮룞???댁뒪 ?뚮옯?쇱엯?덈떎.',
++                en: 'Automated news platform collecting the latest domestic and international IT & AI news daily.'
++            },
++            img: 'img/portfolio_itnews.png',
++            tags: ['Python', 'GitHub Actions', 'Tailwind CSS'],
++            techStack: {
++                ko: ['Python', 'BeautifulSoup4 / RSS', 'GitHub Actions (?먮룞 ?낅뜲?댄듃)', 'HTML5 / JS', 'Tailwind CSS'],
++                en: ['Python', 'BeautifulSoup4 / RSS', 'GitHub Actions (Auto update)', 'HTML5 / JS', 'Tailwind CSS']
++            },
++            features: {
++                ko: [
++                    '援?궡???듭떖 IT/AI ?댁뒪 ?ㅼ떆媛??щ·留?,
++                    'GitHub Actions 湲곕컲 ?꾩쟾 ?먮룞???뚯씠?꾨씪??,
++                    '紐⑤컮??移쒗솕??諛섏쓳??UI ?붿옄??,
++                    'Gemini AI 湲곕컲 湲濡쒕쾶 ?댁뒪 ?쒓뎅???먮룞 踰덉뿭 ?쒓났',
++                    '理쒓렐 7?쇱튂 ?댁뒪 ?곗씠??蹂닿? 諛?議고쉶'
++                ],
++                en: [
++                    'Real-time crawling of core IT/AI news',
++                    'Fully automated pipeline via GitHub Actions',
++                    'Mobile-friendly responsive UI design',
++                    'Auto-translation of global news via Gemini AI',
++                    '7-day news data retention and viewing'
++                ]
++            },
++            architecture: {
++                ko: 'Python ?ㅽ겕?섑븨 遊뉕낵 GitHub Actions瑜??쒖슜??Serverless ?뺤쟻 ??諛고룷 ?꾪궎?띿쿂',
++                en: 'Serverless static web deployment architecture using Python scraping bot and GitHub Actions'
++            },
++            platform: 'Web (Static SPA)'
++        },
++        {
++            id: 'p5',
++            title: 'Generative AI Art Gallery',
++            desc: {
++                ko: 'Midjourney ???앹꽦??AI瑜??쒖슜?섏뿬 湲고쉷 諛??쒖옉???ㅼ뼇??而⑥뀎???꾪듃?뚰겕 媛ㅻ윭由ъ엯?덈떎.',
++                en: 'Gallery of various conceptual artworks planned and created using Generative AI like Midjourney.'
++            },
++            img: ['img/img2/interior4.png', 'img/img2/product3.png', 'img/img2/creature5.png'],
++            tags: ['Generative AI', 'Midjourney', 'Prompt Engineering'],
++            techStack: {
++                ko: ['Midjourney (v5 & v6) / Niji', 'Prompt Engineering', 'Photoshop'],
++                en: ['Midjourney (v5 & v6) / Niji', 'Prompt Engineering', 'Photoshop']
++            },
++            features: {
++                ko: [
++                    '?명뀒由ъ뼱, ?쒗뭹 ?붿옄?? ?щ━泥????ㅼ뼇???뚮쭏??而⑥뀎 ?꾪듃',
++                    '議곕챸(Lighting) 諛??ъ쭏(Material) ?쒖뼱瑜??듯븳 ?ㅼ궗湲??꾨━???곗텧',
++                    'Midjourney 怨좉툒 ?뚮씪誘명꽣(--stylize, --chaos ?? ?쒖슜'
++                ],
++                en: [
++                    'Concept art for various themes including interior, product design, and creatures',
++                    'Photorealistic quality rendering through lighting and material control',
++                    'Utilization of advanced Midjourney parameters (--stylize, --chaos, etc.)'
++                ]
++            },
++            architecture: {
++                ko: '?띿뒪???꾨＼?꾪듃瑜??쒓컖??寃곌낵臾쇰줈 蹂?섑븯湲??꾪븳 諛섎났?곸씤 ?뚮씪誘명꽣 ?뚯뒪??諛?踰좊━?먯씠???꾩텧 ?꾨줈?몄뒪',
++                en: 'Iterative parameter testing and variation derivation process to convert text prompts into visual outputs'
++            },
++            platform: 'Generative Art',
++            gallery: [
++                { category: 'Interior Design', images: ['img/img2/interior4.png', 'img/img2/interior.png', 'img/img2/interior3.png', 'img/img2/interior2.png', 'img/img2/interior5.png', 'img/img2/interior6.png'] },
++                { category: 'Product Layout', images: ['img/img2/product3.png', 'img/img2/product1.png', 'img/img2/product2.png', 'img/img2/product4.png'] },
++                { category: 'Characters & Creatures', images: ['img/img2/creature5.png', 'img/img2/creature1.png', 'img/img2/creature2.png', 'img/img2/charactor5.png', 'img/img2/charictor1.png', 'img/img2/charictor3.png', 'img/img2/charictor4.png', 'img/img2/charictor7.png'] },
++                { category: 'Logos', images: ['img/img2/logo1.png', 'img/img2/logo3.png', 'img/img2/logo5.png', 'img/img2/logo9.png'] },
++                { category: 'Coloring Book', images: ['img/img2/coloringbook1.png', 'img/img2/coloringbook2.png'] }
++            ]
+         }
+     ];
+ 
+@@ -362,7 +581,7 @@
+     }
+ 
+     function loadDict(nextLang) {
+-        console.log('?占쏙옙 Loading dictionary:', nextLang);
++        console.log('? Loading dictionary:', nextLang);
+         return new Promise(function (resolve) {
+             var attempts = 0;
+             var interval = setInterval(function () {
+@@ -375,7 +594,7 @@
+                     attempts++;
+                     if (attempts > 50) {
+                         clearInterval(interval);
+-                        console.warn('?占쏙툘 Dictionary load timeout');
++                        console.warn('?截?Dictionary load timeout');
+                         resolve(false);
+                     }
+                 }
+@@ -391,7 +610,7 @@
+         if (next === lang) return;
+         lang = next;
+         localStorage.setItem('ai_lang', lang);
+-        console.log('?占쏙옙 Language changed to:', lang);
++        console.log('? Language changed to:', lang);
+         loadDict(lang).then(function () { render(); });
+     }
+ 
+@@ -478,11 +697,11 @@
+ 
+ 
+ 
+-    // --- ?占쏀듃?占쎈━???占쎌씠吏 ?占쎈뜑占?(?占쎌꽭 移대뱶 ?占쏀븿) ---
++    // --- ???由????댁? ???(???移대뱶 ??? ---
+     function renderPortfolio() {
+-        console.log('?占쏙옙 Rendering Portfolio Page...');
++        console.log('? Rendering Portfolio Page...');
+ 
+-        // ?占쎈떒 ?占쎈퉬寃뚯씠??占?
++        // ????鍮꾧쾶????
+         var nav =
+             '<nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">' +
+             '<a href="index.html" class="text-white font-bold text-xl flex items-center gap-2 hover:text-accent transition-colors"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>' +
+@@ -492,14 +711,14 @@
+             '</div>' +
+             '</nav>';
+ 
+-        // 占??占쏀듃?占쎈━????占쏙옙???占쎌꽭 移대뱶占??占쎈뜑占?
++        // ????由?????????移대뱶????
+         var detailCards = portfolioData.map(function (item, idx) {
+             var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+             var techList = (lang === 'ko' ? item.techStack.ko : item.techStack.en);
+             var featList = (lang === 'ko' ? item.features.ko : item.features.en);
+             var arch = lang === 'ko' ? item.architecture.ko : item.architecture.en;
+ 
+-            // 湲곗닠 ?占쏀깮 ?占쎄렇 HTML
++            // 湲곗닠 ????洹?HTML
+             var techHtml = techList.map(function (t) {
+                 return '<span class="text-xs font-mono bg-accent/10 text-accent px-2.5 py-1 rounded-lg border border-accent/20">' + t + '</span>';
+             }).join('');
+@@ -512,18 +731,19 @@
+                     '</li>';
+             }).join('');
+ 
+-            // ?占쎄렇 ?占쎈꺼 HTML
++            // ?洹??踰?HTML
+             var tagsHtml = item.tags.map(function (tg) {
+                 return '<span class="text-xs font-bold text-white bg-white/10 px-3 py-1 rounded-full">' + tg + '</span>';
+             }).join('');
+ 
+-            // ?占쏙옙?吏占??占쎌そ/?占쎈Ⅸ占?援먯감 諛곗튂 (吏앹닔: ?占쏙옙?吏 ?占쎌そ, ?占?? ?占쏙옙?吏 ?占쎈Ⅸ占?
++            // ??吏??履??瑜?援먯감 諛곗튂 (吏앹닔: ??吏 ?履? ??? ??吏 ?瑜?
+             var isEven = idx % 2 === 0;
++            var mainImg = Array.isArray(item.img) ? item.img[0] : item.img;
+ 
+             var imageBlock =
+                 '<div class="w-full lg:w-2/5 shrink-0">' +
+                 '<div class="aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-lg">' +
+-                '<img src="' + item.img + '" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="' + item.title + '">' +
++                '<img src="' + mainImg + '" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="' + item.title + '">' +
+                 '</div>' +
+                 '<div class="flex gap-2 mt-3 flex-wrap">' + tagsHtml + '</div>' +
+                 '<p class="text-white/40 text-xs mt-2"><i class="fa-solid fa-display mr-1"></i>' + item.platform + '</p>' +
+@@ -536,27 +756,44 @@
+                 '<p class="text-white/70 text-base leading-relaxed">' + desc + '</p>' +
+                 '</div>' +
+ 
+-                // 二쇱슂 湲곕뒫 ?占쎌뀡
++                // 二쇱슂 湲곕뒫 ???                 '<div>' +
+                 '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-star mr-1.5"></i>' + (lang === 'ko' ? '二쇱슂 湲곕뒫' : 'Key Features') + '</h3>' +
+                 '<ul class="space-y-2">' + featHtml + '</ul>' +
+                 '</div>' +
+ 
+-                // ?占쏀궎?占쎌쿂 ?占쎌쭠 ?占쎌뀡
++                // ???泥??吏????                 '<div class="glass-button rounded-xl p-4 border border-white/10">' +
+-                '<h3 class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-1.5"><i class="fa-solid fa-cubes mr-1.5"></i>' + (lang === 'ko' ? '?占쏀궎?占쎌쿂' : 'Architecture') + '</h3>' +
++                '<h3 class="text-xs font-bold text-neon-orange uppercase tracking-wider mb-1.5"><i class="fa-solid fa-cubes mr-1.5"></i>' + (lang === 'ko' ? '?꾪궎?띿쿂' : 'Architecture') + '</h3>' +
+                 '<p class="text-white/60 text-sm">' + arch + '</p>' +
+                 '</div>' +
+ 
+-                // 湲곗닠 ?占쏀깮 ?占쎌뀡
++                // 湲곗닠 ??????                 '<div>' +
+-                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-code mr-1.5"></i>' + (lang === 'ko' ? '湲곗닠 ?占쏀깮' : 'Tech Stack') + '</h3>' +
++                '<h3 class="text-sm font-bold text-accent uppercase tracking-wider mb-3"><i class="fa-solid fa-code mr-1.5"></i>' + (lang === 'ko' ? '湲곗닠 ?ㅽ깮' : 'Tech Stack') + '</h3>' +
+                 '<div class="flex flex-wrap gap-2">' + techHtml + '</div>' +
+                 '</div>' +
+ 
+                 '</div>';
+ 
+-            // ?占쎌씠?占쎌썐: 吏앹닔/?占??援먯감
++            // ?대?吏 媛ㅻ윭由??뱀뀡 異붽? (留뚯빟 議댁옱?쒕떎硫?
++            var galleryHtml = '';
++            if (item.gallery) {
++                var gallerySections = item.gallery.map(function(gal) {
++                    var images = gal.images.map(function(src) {
++                        return '<div class="rounded-xl overflow-hidden border border-white/10 relative group/img aspect-square cursor-pointer hover:shadow-[0_0_15px_rgba(79,209,255,0.4)] transition-all">' +
++                               '<img src="' + src + '" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy">' +
++                               '</div>';
++                    }).join('');
++                    return '<div class="mb-6"><h4 class="text-white/80 font-bold mb-3 text-sm flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-accent"></div>' + gal.category + '</h4><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">' + images + '</div></div>';
++                }).join('');
++                
++                galleryHtml = '<div class="w-full mt-10 pt-10 border-t border-white/10">' + 
++                              '<h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent mb-6"><i class="fa-solid fa-images mr-2 text-accent"></i>Gallery Showcase</h3>' + 
++                              gallerySections + '</div>';
++            }
++
++            // ????? 吏앹닔/???援먯감
+             var innerHtml = isEven
+                 ? imageBlock + infoBlock
+                 : infoBlock + imageBlock;
+@@ -566,6 +803,7 @@
+                 '<div class="flex flex-col lg:flex-row gap-8 items-start">' +
+                 innerHtml +
+                 '</div>' +
++                galleryHtml +
+                 '</div>'
+             );
+         }).join('');
+@@ -574,18 +812,18 @@
+             nav +
+             '<main class="pt-24 pb-20 px-6 max-w-6xl mx-auto space-y-10">' +
+             '<h1 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center tracking-tight">Portfolio</h1>' +
+-            '<p class="text-white/50 text-center text-lg mb-8">' + (lang === 'ko' ? '吏곸젒 湲고쉷?占쎄퀬 媛쒕컻???占쎈줈?占쏀듃?占쎌엯?占쎈떎.' : 'Projects I planned and built myself.') + '</p>' +
++            '<p class="text-white/50 text-center text-lg mb-8">' + (lang === 'ko' ? '吏곸젒 湲고쉷?섍퀬 媛쒕컻???꾨줈?앺듃?ㅼ엯?덈떎.' : 'Projects I planned and built myself.') + '</p>' +
+             detailCards +
+             '</main>' +
+             '<div class="text-center text-white/40 text-xs pb-8">' + t('footer_note') + '</div>';
+ 
+-        // ?占쎌뼱 ?占쏀솚 踰꾪듉 ?占쎈깽??諛붿씤??
++        // ??????踰꾪듉 ?踰??諛붿씤??
+         var btnKo = $('#btn-ko', portfolioRoot);
+         var btnEn = $('#btn-en', portfolioRoot);
+         if (btnKo) btnKo.addEventListener('click', function () { setLang('ko'); });
+         if (btnEn) btnEn.addEventListener('click', function () { setLang('en'); });
+ 
+-        // ?占쏀겕占????占쎌씠?占쎌씤 ?占쎈땲硫붿씠???占쎌슜
++        // ????????????덈찓??????         var obs = new IntersectionObserver(function (entries) {
+             entries.forEach(function (e) {
+                 if (e.isIntersecting) e.target.classList.add('show');
+@@ -596,7 +834,7 @@
+         initGalaxyCursor();
+         initSplineBackground();
+ 
+-        // [?占쎄퇋 異뷂옙?] ?占쎌씠吏 ?占쎌쟻 濡쒕뵫 ???占쎌빱 ?占쎌튂占??占쎈룞 ?占쏀겕占?
++        // [?洹?異?] ??댁? ???濡쒕뵫 ???而??移???????
+         if (window.location.hash) {
+             setTimeout(function () {
+                 var targetId = window.location.hash.substring(1);
+@@ -608,7 +846,7 @@
+         }
+     }
+ 
+-    // --- Spline 3D 諛곌꼍 珥덇린??(?占쎄났??留곹겕占?Iframe?占쎈줈 ?占쎌슜) ---
++    // --- Spline 3D 諛곌꼍 珥덇린??(?怨??留곹겕?Iframe?濡???? ---
+     function buildSplineSrc(forceRefresh) {
+         if (forceRefresh) return SPLINE_SCENE_URL + '?r=' + Date.now();
+         return SPLINE_SCENE_URL;
+@@ -618,7 +856,7 @@
+         if (!sw) return;
+         sw.style.opacity = '1';
+         if (isFallback) {
+-            console.warn('?占쏙툘 Spline load delayed - showing wrapper anyway');
++            console.warn('?截?Spline load delayed - showing wrapper anyway');
+         }
+     }
+ 
+@@ -649,7 +887,7 @@
+         sw.style.opacity = '0';
+         bindSplineIframeLoad(ifr, sw);
+         ifr.src = buildSplineSrc(true);
+-        console.log('?占쏙옙 Spline refreshed:', reason || 'manual');
++        console.log('? Spline refreshed:', reason || 'manual');
+     }
+ 
+     function bindSplineLifecycleEvents() {
+@@ -657,192 +895,28 @@
+         splineLifecycleBound = true;
+ 
+         window.addEventListener('pageshow', function (evt) {
+-            // BFCache restore can freeze WebGL inside iframe.
+-            if (evt.persisted) {
+-                setTimeout(function () {
+-                    refreshSplineBackground('pageshow-bfcache');
+-                }, 120);
+-            }
++            setTimeout(function () {
++                refreshSplineBackground(evt.persisted ? 'pageshow-bfcache' : 'pageshow');
++            }, 120);
+         });
+ 
+         document.addEventListener('visibilitychange', function () {
+-            if (document.visibilityState === 'hidden') {
+-                splineLastHiddenAt = Date.now();
+-                return;
+-            }
+-
+-            if (Date.now() - splineLastHiddenAt > 800) {
++            if (document.visibilityState === 'visible') {
++                splineLastHiddenAt = 0;
+                 setTimeout(function () {
+                     refreshSplineBackground('visibility-visible');
+                 }, 120);
++            } else {
++                splineLastHiddenAt = Date.now();
+             }
+         });
+-    }
+-
+-    function initSplineBackground(options) {
+-        var opts = options || {};
+-        var forceRefresh = !!opts.forceRefresh;
+-        var sw = document.getElementById('spline-wrapper');
+-        var ifr = document.getElementById('spline-bg');
+-
+-        bindSplineLifecycleEvents();
+ 
+-        if (sw && ifr) {
+-            if (forceRefresh) refreshSplineBackground(opts.reason || 'force');
+-            return;
+-        }
+-
+-        if (sw && !ifr) sw.remove();
+-
+-        console.log('?占쏙옙 Initializing Spline background...');
+-        sw = document.createElement('div');
+-        sw.id = 'spline-wrapper';
+-        sw.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none; background:#0b1220; opacity:0; transition: opacity 1.2s ease-in-out;";
+-
+-        ifr = document.createElement('iframe');
+-        ifr.id = 'spline-bg';
+-        ifr.src = buildSplineSrc(false);
+-        ifr.frameBorder = '0';
+-        ifr.allow = 'autoplay; fullscreen';
+-        ifr.style.width = '100%';
+-        ifr.style.height = '100%';
+-        ifr.style.display = 'block';
+-
+-        sw.appendChild(ifr);
+-        document.body.prepend(sw);
+-        bindSplineIframeLoad(ifr, sw);
++        window.addEventListener('focus', function () {
++            setTimeout(function () {
++                refreshSplineBackground('window-focus');
++            }, 120);
++        });
+     }
+-    // --- RENDER LANDING PAGE ---
+-    function render() {
+-        if (portfolioRoot) {
+-            renderPortfolio();
+-            return;
+-        }
+-
+-        console.log('?占쏙옙 Rendering glassmorphic design...');
+-
+-        var expData = [
+-            ['exp1_t', 'exp1_d', 'fa-laptop-code'],
+-            ['exp2_t', 'exp2_d', 'fa-chalkboard-user'],
+-            ['exp3_t', 'exp3_d', 'fa-earth-asia'],
+-            ['exp4_t', 'exp4_d', 'fa-robot'],
+-            ['exp5_t', 'exp5_d', 'fa-magnifying-glass-chart'],
+-            ['exp6_t', 'exp6_d', 'fa-user-tie'],
+-            ['exp7_t', 'exp7_d', 'fa-server'],
+-            ['exp8_t', 'exp8_d', 'fa-industry']
+-        ];
+-
+-        var expItems = expData.map(function (item) {
+-            return (
+-                '<div class="ai-item glass-card rounded-2xl p-6 flex gap-5 pointer-events-auto group">' +
+-                '<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-cyan-400/10 border border-accent/30 flex items-center justify-center shrink-0 shadow-lg group-hover:from-accent/30 group-hover:to-cyan-400/20 transition-all">' +
+-                '<i class="fa-solid ' + item[2] + ' text-xl text-accent group-hover:text-white transition-colors"></i>' +
+-                '</div>' +
+-                '<div>' +
+-                '<strong class="block text-white text-lg md:text-xl mb-2 group-hover:text-cyan-100 transition-colors">' + t(item[0]) + '</strong>' +
+-                '<span class="block text-white/80 text-sm md:text-base leading-relaxed group-hover:text-white/95 transition-colors">' + t(item[1]) + '</span>' +
+-                '</div>' +
+-                '</div>'
+-            );
+-        }).join('');
+-
+-        var tags = [
+-            { k: 'tag1', i: 'fa-robot' },
+-            { k: 'tag2', i: 'fa-bullhorn' },
+-            { k: 'tag3', i: 'fa-language' },
+-            { k: 'tag4', i: 'fa-code' },
+-            { k: 'tag5', i: 'fa-brain' },
+-            { k: 'tag6', i: 'fa-pen-nib' }
+-        ];
+-        var tagItems = tags.map(function (obj) {
+-            return '<span class="glass-button inline-flex items-center gap-2 px-4 py-2 rounded-full text-white text-xs md:text-sm cursor-default">' +
+-                '<i class="fa-solid ' + obj.i + ' text-accent"></i>' +
+-                t(obj.k) +
+-                '</span>';
+-        }).join('');
+-
+-        var langFloat =
+-            '<div class="fixed top-20 right-8 z-50 flex gap-2 pointer-events-auto">' +
+-            '<button id="btn-ko" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold transition-all ' + (lang === 'ko' ? 'bg-accent/30 text-white border-accent/60 shadow-lg shadow-accent/30' : 'text-white/70 hover:text-white hover:bg-white/10') + '">KO</button>' +
+-            '<button id="btn-en" type="button" class="glass-button px-3 py-1.5 rounded-full text-xs font-semibold transition-all ' + (lang === 'en' ? 'bg-accent/30 text-white border-accent/60 shadow-lg shadow-accent/30' : 'text-white/70 hover:text-white hover:bg-white/10') + '">EN</button>' +
+-            '</div>';
+-
+-        // setTimeout(initSplineViewer, 100); // Using Iframe for external Spline URL
+-
+-        root.innerHTML = [
+-            '<div class="relative w-full overflow-hidden z-20 pointer-events-none">',
+-            langFloat,
+-
+-            '<main class="pointer-events-none relative z-20">',
+-
+-            // HERO SECTION - Large Glass Panel
+-            '<section class="relative py-10">',
+-            '<div class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch px-6">',
+-
+-            // Profile Card - Left Side Glass Panel
+-            '<aside class="md:col-span-4 pointer-events-auto glass-panel glass-glow rounded-3xl p-6 transform hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">',
+-            '<div class="rounded-2xl overflow-hidden border border-white/20 mb-4 flex-shrink-0">',
+-            '<img src="' + CONFIG.assetsBase + '/img/profile.jpg" alt="profile" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">',
+-            '</div>',
+-            '<div class="text-center flex-grow flex flex-col justify-center break-keep">',
+-            '<p class="text-white font-bold text-lg mb-2">' + t('profile_title') + '</p>',
+-            '<p class="text-white/80 text-sm leading-relaxed">' + t('profile_meta') + '</p>',
+-            '<div class="mt-4 text-white/90 text-sm space-y-1">',
+-            '<p><i class="fa-solid fa-phone mr-2 text-accent"></i>010-3327-2581</p>',
+-            '<p><i class="fa-solid fa-envelope mr-2 text-accent"></i>mrsure@daum.net</p>',
+-            '</div>',
+-            '</div>',
+-            '</aside>',
+-
+-            // Main Hero Content - Right Side Glass Panel
+-            '<div class="md:col-span-8 pointer-events-auto glass-panel glass-glow rounded-3xl p-8 md:p-12 flex flex-col justify-center h-full text-center break-keep">',
+-            '<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-button text-white text-base mb-6 mx-auto">',
+-            '<span class="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_10px_rgba(79,209,255,0.8)]"></span>',
+-            t('hero_kicker'),
+-            '</div>',
+-
+-            '<h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-6" style="line-height: 1.6;">',
+-            t('hero_h1_line1'),
+-            '</h1>',
+-
+-            '<p class="text-white/90 text-base md:text-lg mx-auto mb-8 leading-relaxed max-w-3xl">' + t('hero_sub') + '</p>',
+-
+-            '<div class="flex flex-wrap gap-4 justify-center">',
+-            '<a class="glass-button px-8 py-4 rounded-2xl text-white font-bold text-base" href="#experience">' + t('cta_experience') + '</a>',
+-            '<a class="glass-button px-8 py-4 rounded-2xl text-white font-bold text-base" href="#contact">' + t('cta_contact') + '</a>',
+-            '</div>',
+-            '</div>',
+-
+-            '</div>',
+-            '</section>',
+-
+-            '</div>',
+-            '</section>',
+-
+-            // Portfolio Carousel (New Section)
+-            '<section class="relative py-10 overflow-hidden">',
+-            '<div class="max-w-[1120px] mx-auto px-6 pointer-events-auto ai-fade">',
+-            '<div class="flex justify-between items-end mb-6">',
+-            '<h2 class="text-3xl font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent to-white">Portfolio</h2>',
+-            '<a href="portfolio.html" class="text-sm text-accent hover:text-white transition-colors flex items-center gap-1">View All <i class="fa-solid fa-arrow-right"></i></a>',
+-            '</div>',
+-            // Carousel Container
+-            // Carousel Container (Marquee)
+-            '<div class="w-full overflow-hidden mask-linear-fade">',
+-            '<div class="flex gap-6 animate-marquee">',
+-            // Duplicate data 3 times for smooth infinite loop on wide screens
+-            [...portfolioData, ...portfolioData, ...portfolioData].map(function (item) {
+-                var desc = lang === 'ko' ? item.desc.ko : item.desc.en;
+-                return (
+-                    '<div class="shrink-0 w-[280px] md:w-[320px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:border-accent/50 transition-colors" onclick="location.href=\'portfolio.html#' + item.id + '\'">' +
+-                    '<div class="h-40 bg-black/50 relative overflow-hidden">' +
+-                    '<img src="' + item.img + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">' +
+-                    '</div>' +
+-                    '<div class="p-4">' +
+-                    '<h3 class="text-lg font-bold text-white mb-1 truncate">' + item.title + '</h3>' +
+-                    '<p class="text-xs text-white/60 line-clamp-2">' + desc + '</p>' +
+-                    '</div>' +
+-                    '</div>'
+                 );
+             }).join(''),
+             '</div>',

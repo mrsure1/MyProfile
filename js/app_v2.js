@@ -98,6 +98,7 @@
 
       /* Hero에서만 로봇 추적(여백에서 통과). 아래 섹션은 인터랙션(클릭/폼) 우선 */
       #ai-landing-root main section { pointer-events: none; }
+      #ai-portfolio-root main { pointer-events: none; }
       .glass-panel, .glass-card { pointer-events: none; }
       .glass-panel a, .glass-panel button, .glass-panel input, .glass-panel textarea, .glass-panel select, .glass-panel label,
       .glass-panel [onclick],
@@ -274,26 +275,18 @@
         email: 'leeyob@gmail.com',
         assetsBase: '.',
         defaultLang: 'ko',
-        scriptUrl: 'https://script.google.com/macros/s/AKfycbzGnoHUxuxqgUBYSXinorp0C6F4wagimq_t7cJe2wQlg4Z15H-ZcUyzuY08b7A0vpaN/exec'
+        scriptUrl: 'https://script.google.com/macros/s/AKfycbwOTDOonzDgY0EZfFHQJxcWI4ue4iR0GVLZ__IQuCU5wSJDoHwW_-8Gdt75aB4Z8uaG/exec'
     };
 
     var dict = {};
     var lang = localStorage.getItem('ai_lang') || CONFIG.defaultLang;
-    var SPLINE_SCENE_URL = 'https://my.spline.design/nexbotrobotcharacterconcept-LWKC4r0rScgYpKlL2qTm6r4o/';
-    var SPLINE_REFRESH_COOLDOWN_MS = 1200;
-    var SPLINE_RECOVERY_DEBOUNCE_MS = 2500;
-    var splineLifecycleBound = false;
-    var splineLastRefreshAt = 0;
-    var splineLastRecoveryAt = 0;
-    var splineLastRecoveryReason = '';
-    var splineLastHiddenAt = 0;
-    var splineRecoveryToken = 0;
-    var splineInitializedAt = 0;
+    var SPLINE_SCENE_URL = null;
+    var shaderInitializedAt = 0;
     var aiCarouselTimer = null;
     function $(sel, el) { return (el || document).querySelector(sel); }
     function $$(sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); }
-    function debugLog() {}
-    function logSplineDomState() {}
+    function debugLog() { }
+    function logSplineDomState() { }
     var AI_CAROUSEL_ROTATION = [
         'img/img2/interior4.png',
         'img/img2/creature1.png',
@@ -690,8 +683,8 @@
             var arch = lang === 'ko' ? item.architecture.ko : item.architecture.en;
             var liveLinkHtml = item.liveUrl
                 ? (
-                    '<a href="' + item.liveUrl + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-white transition-colors">' +
-                    '<i class="fa-solid fa-up-right-from-square text-xs"></i>' +
+                    '<a href="' + item.liveUrl + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent to-neon-orange text-white text-sm font-bold shadow-[0_0_20px_rgba(79,209,255,0.3)] hover:shadow-[0_0_30px_rgba(79,209,255,0.6)] hover:-translate-y-0.5 transition-all duration-300 group">' +
+                    '<i class="fa-solid fa-up-right-from-square text-xs group-hover:rotate-12 transition-transform"></i>' +
                     (lang === 'ko' ? '사이트 방문' : 'Visit Site') +
                     '</a>'
                 )
@@ -738,9 +731,9 @@
                 var categorySections = item.gallery.map(function (section) {
                     var sectionImages = Array.isArray(section.images) ? section.images : [];
                     var sectionThumbs = sectionImages.map(function (src) {
-                        return '<a href="' + src + '" target="_blank" rel="noopener noreferrer" class="group block rounded-xl overflow-hidden border border-white/10 hover:border-accent/70 transition-colors bg-black/20">' +
+                        return '<button onclick="showImageModal(\'' + src + '\')" class="group block rounded-xl overflow-hidden border border-white/10 hover:border-accent/70 transition-colors bg-black/20 text-left w-full">' +
                             '<img src="' + src + '" alt="' + section.category + '" class="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300">' +
-                            '</a>';
+                            '</button>';
                     }).join('');
 
                     return '<div class="space-y-3">' +
@@ -805,9 +798,9 @@
             );
         }).join('');
 
-        /* 3D 배경(z-index:0) 위에 콘텐츠가 항상 보이도록 래퍼에 z-20 적용 */
+        /* 3D 배경(z-index:0) 위에 콘텐츠가 항상 보이도록 z-20. pointer-events-none 으로 빈 영역은 Spline에 마우스 전달(로봇 따라가기). */
         portfolioRoot.innerHTML =
-            '<div class="relative z-20 w-full">' +
+            '<div class="relative z-20 w-full pointer-events-none">' +
             nav +
             '<main class="pt-24 pb-20 px-6 max-w-6xl mx-auto space-y-10">' +
             '<h1 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center tracking-tight">' +
@@ -834,8 +827,8 @@
         $$('.ai-fade', portfolioRoot).forEach(function (el) { obs.observe(el); });
 
         initGalaxyCursor();
-        // 포트폴리오 페이지에서도 메인 랜딩과 동일한 Spline 3D 배경 사용
-        initSplineBackground({ forceRefresh: true, reason: 'portfolio-render' });
+        // 포트폴리오 페이지에서도 메인 랜딩과 동일한 Shader 배경 사용
+        initShaderBackground();
 
         // 페이지 동적 로딩 시 해시 앵커 자동 스크롤
         if (window.location.hash) {
@@ -849,231 +842,180 @@
         }
     }
 
-    // --- Spline 3D 배경 초기화 (공식 링크를 iframe으로 사용) ---
+    // --- GLSL Shader Background (나선형 물결 패턴) ---
+    // --- GLSL Shader Background (Electric Lightning Storm) ---
+    function initShaderBackground() {
+        console.log("Initializing Shader Background [Lightning]...");
+        if (document.getElementById('shader-bg')) return;
+        removeSparkBackground();
+
+        var container = document.createElement('div');
+        container.id = 'shader-bg';
+        // z-index: 0 and transparent body to ensure visibility
+        container.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; background:#02050a; pointer-events:none;";
+        document.body.style.backgroundColor = 'transparent';
+
+        var canvas = document.createElement('canvas');
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        container.appendChild(canvas);
+        document.body.prepend(container);
+
+        var gl = canvas.getContext('webgl', { antialias: true }) || canvas.getContext('experimental-webgl');
+        if (!gl) {
+            console.error('WebGL not supported on this browser.');
+            return;
+        }
+        console.log("WebGL Context Created Successfully.");
+
+        var vs = `
+            attribute vec2 position;
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        var fs = `
+            precision highp float;
+            uniform float u_time;
+            uniform vec2 u_mouse;
+            uniform vec2 u_resolution;
+
+            // Simple noise for organic movement
+            float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+
+            // Isometric helper: Transform to grid coordinates
+            vec2 toIso(vec2 p) {
+                return vec2(p.x - p.y, (p.x + p.y) * 0.5);
+            }
+
+            // Function to generate RGB color cycle
+            vec3 getRGB(float t) {
+                return 0.5 + 0.5 * cos(t + vec3(0, 2, 4));
+            }
+
+            void main() {
+                vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.y, u_resolution.x);
+                
+                // Mouse interactive displacement
+                vec2 m = (u_mouse - 0.5 * u_resolution.xy) / min(u_resolution.y, u_resolution.x);
+                
+                // Grid scaling
+                float scale = 12.0;
+                vec2 gv = uv * scale;
+                
+                // Isometric projection adjustment
+                vec2 isoV = vec2(gv.x + gv.y * 2.0, gv.x - gv.y * 2.0) * 0.5;
+                vec2 id = floor(isoV);
+                vec2 f = fract(isoV);
+
+                // Distance to mouse for "Flashlight" reveal effect
+                float distToMouse = length(uv - m);
+                float mouseReveal = smoothstep(0.45, 0.1, distToMouse);
+                
+                // Individual cube "height" or intensity modulation
+                float h = hash(id);
+                float wave = sin(u_time * 1.5 + (id.x + id.y) * 0.5) * 0.5 + 0.5;
+                
+                // Cube face highlights (simulating 3D)
+                float edge = smoothstep(0.02, 0.0, abs(f.x - 0.5) - 0.48) + smoothstep(0.02, 0.0, abs(f.y - 0.5) - 0.48);
+                
+                // RGB Color Cycle
+                vec3 baseRGB = getRGB(u_time * 0.3 + (id.x - id.y) * 0.1);
+                
+                // Shading logic to give volume
+                float shade = (f.x + f.y) * 0.5;
+                vec3 color = baseRGB * wave * shade;
+                
+                // Add outlines/edges for that "Digital Grid" look
+                color += baseRGB * edge * 0.4;
+                
+                // Apply the mouse reveal (flashlight) mask
+                color *= mouseReveal;
+
+                // Subtle ambient glow at the cursor position
+                color += baseRGB * smoothstep(0.18, 0.0, distToMouse) * 0.45;
+
+                // Deep Space Background Color (Midnight Blue / Deep Purple)
+                vec3 spaceColor = mix(vec3(0.01, 0.015, 0.04), vec3(0.02, 0.01, 0.035), uv.y * 0.5 + 0.5);
+                
+                // Background fade - blend the grid/glow with the space color
+                color = mix(spaceColor, color, mouseReveal + 0.1);
+
+                // Final brightness adjustment for text readability
+                color *= 0.7;
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        function createShader(gl, type, source) {
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            return shader;
+        }
+
+        var vertexShader = createShader(gl, gl.VERTEX_SHADER, vs);
+        var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fs);
+        if (!vertexShader || !fragmentShader) return;
+
+        var program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Program link error:', gl.getProgramInfoLog(program));
+            return;
+        }
+        gl.useProgram(program);
+        console.log("Shader Program Linked and Ready.");
+
+        var buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+
+        var pos = gl.getAttribLocation(program, 'position');
+        gl.enableVertexAttribArray(pos);
+        gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+        var utime = gl.getUniformLocation(program, 'u_time');
+        var umouse = gl.getUniformLocation(program, 'u_mouse');
+        var ures = gl.getUniformLocation(program, 'u_resolution');
+
+        var mouse = { x: 0, y: 0 };
+        window.addEventListener('mousemove', function (e) {
+            mouse.x = e.clientX;
+            mouse.y = canvas.height - e.clientY;
+        });
+
+        function renderShader(time) {
+            if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+                canvas.width = canvas.clientWidth;
+                canvas.height = canvas.clientHeight;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+
+            gl.uniform1f(utime, time / 1000);
+            gl.uniform2f(umouse, mouse.x, mouse.y);
+            gl.uniform2f(ures, canvas.width, canvas.height);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            requestAnimationFrame(renderShader);
+        }
+        requestAnimationFrame(renderShader);
+    }
+
     function removeSparkBackground() {
         var spark = document.getElementById('spark-bg');
         if (spark) spark.remove();
     }
 
-    function initSparkBackground() {
-        var existing = document.getElementById('spark-bg');
-        if (existing) return;
-
-        var spline = document.getElementById('spline-wrapper');
-        if (spline) spline.remove();
-
-        var spark = document.createElement('div');
-        spark.id = 'spark-bg';
-        spark.className = 'spark-bg';
-
-        var layer = document.createElement('div');
-        layer.className = 'spark-layer';
-        spark.appendChild(layer);
-
-        for (var i = 0; i < 44; i++) {
-            var dot = document.createElement('span');
-            dot.className = 'spark-dot';
-            dot.style.left = (Math.random() * 100).toFixed(2) + '%';
-            dot.style.top = (Math.random() * 100).toFixed(2) + '%';
-            dot.style.animationDelay = (Math.random() * 2.8).toFixed(2) + 's, ' + (Math.random() * 1.5).toFixed(2) + 's';
-            dot.style.animationDuration = (5 + Math.random() * 5).toFixed(2) + 's, ' + (1.8 + Math.random() * 1.5).toFixed(2) + 's';
-            spark.appendChild(dot);
-        }
-
-        document.body.prepend(spark);
-    }
-
-    function buildSplineSrc(forceRefresh) {
-        var base = SPLINE_SCENE_URL;
-        var sep = base.indexOf('?') === -1 ? '?' : '&';
-        var nonce = forceRefresh ? Date.now() : Math.floor(Date.now() / 5000);
-        return base + sep + 'cb=' + nonce;
-    }
-
-    function showSplineWrapper(sw, isFallback) {
-        if (!sw) return;
-        sw.style.opacity = '1';
-        if (isFallback) {
-            console.warn('Spline load delayed - showing wrapper anyway');
-        }
-    }
-
-    function bindSplineIframeLoad(ifr, sw) {
-        ifr.onload = function () {
-            // #region agent log
-            debugLog('H6', 'js/app_v2.js:bindSplineIframeLoad', 'iframe onload', {
-                iframeSrc: ifr ? ifr.src : null,
-                wrapperOpacity: sw ? sw.style.opacity : null
-            });
-            // #endregion
-            setTimeout(function () {
-                showSplineWrapper(sw, false);
-                console.log('Spline iframe loaded');
-                logSplineDomState('after-onload-show');
-            }, 350);
-        };
-        ifr.onerror = function () {
-            // #region agent log
-            debugLog('H6', 'js/app_v2.js:bindSplineIframeLoad', 'iframe onerror', {
-                iframeSrc: ifr ? ifr.src : null
-            });
-            // #endregion
-        };
-
-        setTimeout(function () {
-            if (sw && sw.style.opacity !== '1') {
-                showSplineWrapper(sw, true);
-            }
-        }, 10000);
-    }
-
-    function refreshSplineBackground(reason) {
-        var sw = document.getElementById('spline-wrapper');
-        var ifr = document.getElementById('spline-bg');
-        if (!sw || !ifr) return;
-
-        var now = Date.now();
-        if (now - splineLastRefreshAt < SPLINE_REFRESH_COOLDOWN_MS) return;
-        splineLastRefreshAt = now;
-
-        sw.style.opacity = '0';
-        bindSplineIframeLoad(ifr, sw);
-        ifr.src = buildSplineSrc(true);
-        console.log('Spline refreshed:', reason || 'manual');
-        logSplineDomState('after-refresh-src-set');
-    }
-
-    /** Single orchestrator: all recovery triggers go through here. Dedupes by time window and same-reason. */
-    function requestSplineRecovery(reason) {
-        var now = Date.now();
-        var r = reason || 'recover';
-        if (splineLastRecoveryAt && (now - splineLastRecoveryAt) < SPLINE_RECOVERY_DEBOUNCE_MS) return;
-        if (splineLastRecoveryReason === r && splineLastRecoveryAt && (now - splineLastRecoveryAt) < 2000) return;
-        splineLastRecoveryAt = now;
-        splineLastRecoveryReason = r;
-        splineRecoveryToken = now;
-        // #region agent log
-        debugLog('H2', 'js/app_v2.js:requestSplineRecovery', 'recovery accepted', {
-            reason: r,
-            now: now,
-            lastRefreshAt: splineLastRefreshAt,
-            visibilityState: document.visibilityState
-        });
-        // #endregion
-        refreshSplineBackground(r);
-    }
-
-    function triggerSplineRecovery(reason) {
-        requestSplineRecovery(reason || 'recover');
-    }
-
-    function bindSplineLifecycleEvents() {
-        if (splineLifecycleBound) return;
-        splineLifecycleBound = true;
-
-        window.addEventListener('pageshow', function (evt) {
-            // #region agent log
-            debugLog('H1', 'js/app_v2.js:pageshow', 'pageshow event', {
-                persisted: !!evt.persisted,
-                visibilityState: document.visibilityState,
-                initializedAgoMs: Date.now() - splineInitializedAt
-            });
-            // #endregion
-            // Normal full navigation recreates iframe, so recovery is needed only on BFCache restore.
-            if (evt.persisted) triggerSplineRecovery('pageshow-bfcache');
-        });
-
-        document.addEventListener('resume', function () {
-            // #region agent log
-            debugLog('H3', 'js/app_v2.js:resume', 'resume event', {
-                visibilityState: document.visibilityState
-            });
-            // #endregion
-            triggerSplineRecovery('document-resume');
-        });
-
-        window.addEventListener('focus', function () {
-            // #region agent log
-            debugLog('H3', 'js/app_v2.js:focus', 'focus event', {
-                visibilityState: document.visibilityState,
-                sinceHiddenMs: Date.now() - splineLastHiddenAt
-            });
-            // #endregion
-            // Focus events are noisy; avoid forcing refresh from focus alone.
-        });
-
-        document.addEventListener('visibilitychange', function () {
-            // #region agent log
-            debugLog('H3', 'js/app_v2.js:visibilitychange', 'visibilitychange event', {
-                visibilityState: document.visibilityState,
-                sinceHiddenMs: Date.now() - splineLastHiddenAt
-            });
-            // #endregion
-            if (document.visibilityState === 'hidden') {
-                splineLastHiddenAt = Date.now();
-                return;
-            }
-
-            var hiddenMs = Date.now() - splineLastHiddenAt;
-            var initAgeMs = Date.now() - splineInitializedAt;
-            if (!splineLastHiddenAt || hiddenMs < 300 || initAgeMs < 1500) return;
-            triggerSplineRecovery(hiddenMs > 800 ? 'visibility-visible' : 'visibility-quick-return');
-        });
-    }
-
-    function initSplineBackground(options) {
-        var opts = options || {};
-        var forceRefresh = !!opts.forceRefresh;
-        var sw = document.getElementById('spline-wrapper');
-        var ifr = document.getElementById('spline-bg');
-        removeSparkBackground();
-        // #region agent log
-        debugLog('H4', 'js/app_v2.js:initSplineBackground', 'init spline background', {
-            href: window.location.href,
-            forceRefresh: forceRefresh,
-            hasRoot: !!root,
-            hasPortfolioRoot: !!portfolioRoot,
-            hasWrapper: !!sw,
-            hasIframe: !!ifr
-        });
-        // #endregion
-
-        bindSplineLifecycleEvents();
-
-        if (sw && ifr) {
-            if (!splineInitializedAt) splineInitializedAt = Date.now();
-            if (forceRefresh) refreshSplineBackground(opts.reason || 'force');
-            return;
-        }
-
-        if (sw && !ifr) sw.remove();
-
-        console.log('Initializing Spline background...');
-        sw = document.createElement('div');
-        sw.id = 'spline-wrapper';
-        // z-index:0 + pointer-events:auto so Spline iframe receives mousemove (robot follow).
-        // Content layer is z-20 with pointer-events-none; only cards/buttons have pointer-events-auto, so events pass through to Spline in empty areas.
-        sw.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:auto; background:#0f172a; opacity:0; transition: opacity 1.2s ease-in-out;";
-        splineInitializedAt = Date.now();
-
-        ifr = document.createElement('iframe');
-        ifr.id = 'spline-bg';
-        ifr.src = buildSplineSrc(false);
-        ifr.frameBorder = '0';
-        ifr.allow = 'autoplay; fullscreen';
-        ifr.style.width = '100%';
-        ifr.style.height = '100%';
-        ifr.style.display = 'block';
-        // #region agent log
-        debugLog('H13', 'js/app_v2.js:initSplineBackground', 'initial iframe src with cache-bust', {
-            iframeSrc: ifr.src
-        });
-        // #endregion
-
-        sw.appendChild(ifr);
-        document.body.prepend(sw);
-        bindSplineIframeLoad(ifr, sw);
-    }
     // --- RENDER LANDING PAGE ---
     function render() {
         if (portfolioRoot) {
@@ -1325,7 +1267,7 @@
         ].join('');
 
 
-        initSplineBackground();
+        initShaderBackground();
         initAICarouselRotation(root);
 
         var btnKo = $('#btn-ko', root);
@@ -1363,64 +1305,51 @@
                 var existingStatus = container.querySelector('.status-msg');
                 if (existingStatus) existingStatus.remove();
 
-                if (!CONFIG.scriptUrl) {
-                    // Fallback to mailto
-                    window.location.href = 'mailto:' + CONFIG.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(message);
-
-                    // Reset Button
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
-                    submitBtn.style.opacity = '1';
-                    submitBtn.style.cursor = 'pointer';
-                    return;
-                }
-
+                // 1. Google Sheets 저장용 데이터 준비
                 var formData = new URLSearchParams();
                 formData.append('subject', subject);
                 formData.append('name', name);
                 formData.append('phone', phone);
                 formData.append('message', message);
 
-                fetch(CONFIG.scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
-                })
-                    .then(() => {
-                        // Success UI
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
-                        submitBtn.style.opacity = '1';
-                        submitBtn.style.cursor = 'pointer';
 
-                        // Clear form
-                        $('#contact-subject').value = '';
-                        $('#contact-name').value = '';
-                        $('#contact-phone').value = '';
-                        $('#contact-message').value = '';
-
-                        // Show Success Message
-                        var successMsg = document.createElement('p');
-                        successMsg.className = 'status-msg text-green-400 text-center mt-4 font-bold animate-pulse';
-                        successMsg.textContent = lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.';
-                        container.appendChild(successMsg);
-
-                        setTimeout(() => { if (successMsg) successMsg.remove(); }, 5000);
+                // 4. 구글 시트로 전송 (GAS에서 텔레그램 자동 발송 처리됨)
+                if (CONFIG.scriptUrl) {
+                    fetch(CONFIG.scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData.toString()
                     })
-                    .catch(err => {
-                        console.error('Error:', err);
-                        // Error UI
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
-                        submitBtn.style.opacity = '1';
-                        submitBtn.style.cursor = 'pointer';
+                        .then(function () {
+                            console.log('Inquiry sent successfully to GAS');
+                        })
+                        .catch(function (err) {
+                            console.error('Sheet saving failed:', err);
+                        });
+                }
 
-                        var errorMsg = document.createElement('p');
-                        errorMsg.className = 'status-msg text-red-400 text-center mt-4 font-bold';
-                        errorMsg.textContent = lang === 'ko' ? '전송 실패. 이메일로 직접 문의해주세요.' : 'Failed to send. Please email directly.';
-                        container.appendChild(errorMsg);
-                    });
+                // 5. UI 업데이트 (성공 메시지 및 폼 초기화)
+                setTimeout(function () {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">' + t('contact_submit_btn') + ' <i class="fa-solid fa-paper-plane text-sm"></i></span>';
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+
+                    // Clear form
+                    $('#contact-subject').value = '';
+                    $('#contact-name').value = '';
+                    $('#contact-phone').value = '';
+                    $('#contact-message').value = '';
+
+                    // Show Status Message
+                    var successMsg = document.createElement('p');
+                    successMsg.className = 'status-msg text-green-400 text-center mt-4 font-bold animate-pulse';
+                    successMsg.textContent = lang === 'ko' ? '문의가 성공적으로 전송되었습니다.' : 'Your inquiry was sent successfully.';
+                    container.appendChild(successMsg);
+
+                    setTimeout(function () { if (successMsg) successMsg.remove(); }, 5000);
+                }, 600);
             });
         }
 
@@ -1446,3 +1375,54 @@
         });
 })();
 
+
+// Image Modal Functionality
+window.showImageModal = function (src) {
+    var modalId = 'gallery-modal';
+    var existing = document.getElementById(modalId);
+    if (existing) existing.remove();
+
+    var modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+    modal.innerHTML =
+        '<div class="relative max-w-[95vw] max-h-[95vh] scale-90 transition-transform duration-300">' +
+        '<img src="' + src + '" class="rounded-2xl max-w-full max-h-[90vh] object-contain shadow-2xl border border-white/10">' +
+        '<button onclick="closeImageModal()" class="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg">' +
+        '<i class="fa-solid fa-xmark text-lg"></i>' +
+        '</button>' +
+        '</div>';
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // Trigger animation
+    setTimeout(function () {
+        modal.classList.add('opacity-100');
+        modal.querySelector('div').classList.remove('scale-90');
+        modal.querySelector('div').classList.add('scale-100');
+    }, 10);
+
+    modal.onclick = function (e) {
+        if (e.target === modal) closeImageModal();
+    };
+};
+
+window.closeImageModal = function () {
+    var modal = document.getElementById('gallery-modal');
+    if (!modal) return;
+
+    modal.classList.remove('opacity-100');
+    modal.querySelector('div').classList.remove('scale-100');
+    modal.querySelector('div').classList.add('scale-90');
+
+    setTimeout(function () {
+        modal.remove();
+        document.body.style.overflow = '';
+    }, 300);
+};
+
+// Handle ESC key to close modal
+window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeImageModal();
+});

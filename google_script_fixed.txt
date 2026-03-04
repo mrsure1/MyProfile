@@ -1,0 +1,63 @@
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var p = e.parameter;
+    
+    // 1. 구글 시트에 데이터 저장
+    sheet.appendRow([
+      new Date(),
+      p.subject,
+      p.name,
+      p.phone,
+      p.message
+    ]);
+
+    // 2. 텔레그램 알림 발송 (순서 변경: return 전으로 이동)
+    // p.name, p.phone 등 전달받은 파라미터를 사용합니다.
+    sendTelegramNotification(p.name, p.phone, p.subject, p.message);
+
+    return ContentService.createTextOutput("success");
+    
+  } catch (err) {
+    // 에러 발생 시 로그 기록 및 에러 메시지 반환
+    console.error("Error: " + err.toString());
+    return ContentService.createTextOutput("error: " + err.toString());
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 텔레그램 자동 발송 함수
+function sendTelegramNotification(name, phone, subject, message) {
+  // [중요] 아래 두 정보를 확인하여 정확히 입력해주세요.
+  var botToken = "8582233732:AAGXFko90iJzCubO9KZYrvGdgu6M3O_ca4k"; // 사용 중인 봇 토큰
+  var chatId = "여기에_본인의_숫자_ID를_입력하세요"; // 예: 123456789 (DrumbitBot이 아닌 숫자 ID)
+  
+  var text = "🚀 [새 문의사항 알림]\n\n" +
+             "👤 이름: " + name + "\n" +
+             "📞 연락처: " + phone + "\n" +
+             "📌 제목: " + subject + "\n" +
+             "📝 내용: " + message;
+             
+  var url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
+  var payload = {
+    "chat_id": chatId,
+    "text": text
+  };
+  
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true // 에러 발생 시에도 중단되지 않도록 함
+  };
+  
+  try {
+    UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    console.error("Telegram Error: " + e.toString());
+  }
+}

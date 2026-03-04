@@ -88,27 +88,7 @@
 <body>
     <div id="ai-landing-root"></div>
 
-    <!-- Spline Viewer: 로컬 캐시 우선, 없으면 CDN 폴백 -->
-    <script>
-            // 로컬 spline-viewer.js 파일이 있으면 사용, 없으면 CDN
-            (function () {
-                var s = document.createElement('script');
-                s.type = 'module';
-                // 로컬 파일 우선 시도
-                s.src = 'js/spline-viewer.js';
-                s.onerror = function () {
-                    // 로컬 실패 시 CDN 폴백
-                    var fallback = document.createElement('script');
-                    fallback.type = 'module';
-                    fallback.src = 'https://unpkg.com/@splinetool/viewer@1.9.59/build/spline-viewer.js';
-                    document.head.appendChild(fallback);
-                    console.warn('⚠️ 로컬 spline-viewer.js 없음, CDN에서 로드 중...');
-                };
-                document.head.appendChild(s);
-            })();
-    </script>
     <script src="js/lang-data.js"></script>
-    <script src="js/spline-data.js"></script>
 
     <!-- Main App -->
     <script src="js/app_v2.js?v=spline_lifecycle_20260223_textfix"></script>
