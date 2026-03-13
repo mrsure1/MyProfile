@@ -720,6 +720,7 @@
                 '</div>' +
                 '<div class="flex gap-2 mt-3 flex-wrap">' + tagsHtml + '</div>' +
                 '<p class="text-white/40 text-xs mt-2"><i class="fa-solid fa-display mr-1"></i>' + item.platform + '</p>' +
+                (liveLinkHtml ? '<div class="mt-4 w-full flex">' + liveLinkHtml + '</div>' : '') +
                 '</div>';
 
             var galleryHtml = '';
@@ -761,7 +762,6 @@
                 '<div>' +
                 '<h2 class="text-2xl md:text-3xl font-bold text-white mb-2">' + item.title + '</h2>' +
                 '<p class="text-white/70 text-base leading-relaxed">' + desc + '</p>' +
-                (liveLinkHtml ? '<div class="mt-3">' + liveLinkHtml + '</div>' : '') +
                 '</div>' +
 
                 // 주요 기능 섹션
