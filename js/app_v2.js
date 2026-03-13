@@ -378,6 +378,7 @@
                 en: 'Government policy fund matching platform for SMEs. AI-powered analysis to find optimal grants and subsidies.'
             },
             img: 'img/portfolio_policy.jpg',
+            liveUrl: 'https://policymatch-korea.pages.dev/',
             tags: ['Next.js', 'Supabase', 'Gemini AI'],
             techStack: {
                 ko: ['Next.js 16 (App Router)', 'TypeScript', 'Tailwind CSS 4', 'Supabase (PostgreSQL)', 'Zustand (상태 관리)', 'Gemini AI (정책 분석)', 'Python (데이터 스크래핑)'],
@@ -683,9 +684,9 @@
             var arch = lang === 'ko' ? item.architecture.ko : item.architecture.en;
             var liveLinkHtml = item.liveUrl
                 ? (
-                    '<a href="' + item.liveUrl + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent to-neon-orange text-white text-sm font-bold shadow-[0_0_20px_rgba(79,209,255,0.3)] hover:shadow-[0_0_30px_rgba(79,209,255,0.6)] hover:-translate-y-0.5 transition-all duration-300 group">' +
+                    '<a href="' + item.liveUrl + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-[#0b1220] text-sm font-bold shadow-[0_0_20px_rgba(79,209,255,0.3)] hover:shadow-[0_0_30px_rgba(79,209,255,0.6)] hover:-translate-y-0.5 transition-all duration-300 group">' +
                     '<i class="fa-solid fa-up-right-from-square text-xs group-hover:rotate-12 transition-transform"></i>' +
-                    (lang === 'ko' ? '사이트 방문' : 'Visit Site') +
+                    (lang === 'ko' ? '사이트 참조' : 'Visit Site') +
                     '</a>'
                 )
                 : '';
